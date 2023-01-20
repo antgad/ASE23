@@ -5,11 +5,11 @@ from math import inf
 
 class NUM:
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.n, self.mu, self.m2 = 0, 0, 0
         self.lo, self.hi = inf, -inf
     
-    def add(self, n) -> None: # add `n`, update lo,hi and stuff needed for standard deviation
+    def add(self, n): # add `n`, update lo,hi and stuff needed for standard deviation
         if n != '?':
             self.n  = self.n + 1
             d = n - self.mu
@@ -18,10 +18,10 @@ class NUM:
             self.lo = min(n, self.lo)
             self.hi = max(n, self.hi) 
     
-    def mid(self) -> int: # return the mean
+    def mid(self): # return the mean
         return self.mu
     
-    def div(self) -> int: # return standard deviation using Welford's algorithm http://t.ly/nn_W
+    def div(self): # return standard deviation using Welford's algorithm http://t.ly/nn_W
         if self.m2 <0 or self.n < 2:
             return 0
         else:
