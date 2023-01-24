@@ -38,4 +38,4 @@ jobs:
 #       run: |
 #         pytest
     - name: Run tests
-      run: python HW1/tests.py
+      run: python src/tests.py
