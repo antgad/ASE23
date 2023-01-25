@@ -1,6 +1,7 @@
 # ASE23
 ![Github](https://img.shields.io/github/license/antgad/ase23?style=plastic)
 [![DOI](https://zenodo.org/badge/591017365.svg)](https://zenodo.org/badge/latestdoi/591017365?style=plastic)
+![](https://img.shields.io/github/last-commit/antgad/ase23?style=plastic)
 ![](https://img.shields.io/github/languages/top/antgad/ase23?style=plastic)
 ![Github](https://img.shields.io/github/actions/workflow/status/antgad/ase23/.github/workflows/pytest.yml?style=plastic)
 ![Github Issues](https://img.shields.io/github/issues/antgad/ase23?style=plastic)
