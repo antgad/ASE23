@@ -1,8 +1,8 @@
 import re
 
-from num import NUM
-from sym import SYM
-from row import ROW
+from NUM import NUM
+from SYM import SYM
+from ROW import ROW
 
 class COLS:
     """
