@@ -6,11 +6,11 @@ from utils import rnd
 
 class NUM:
 
-    def __init__(self, at, txt):
-        self.at = at or 0, self.txt = txt or ""
+    def __init__(self, at = 0, txt = ""):
+        self.at = at, self.txt = txt
         self.n, self.mu, self.m2 = 0, 0, 0
         self.lo, self.hi = inf, -inf
-        self.w = -1 if "-" in self.txt else 1
+        self.w = -1 if self.txt[-1] == '-' else 1
     
     def add(self, n): # add `n`, update lo,hi and stuff needed for standard deviation
         if n != '?':
@@ -21,10 +21,10 @@ class NUM:
             self.lo = min(n, self.lo)
             self.hi = max(n, self.hi) 
     
-    def mid(self): # return the mean
+    def mid(self,x): # return the mean
         return self.mu
     
-    def div(self): # return standard deviation using Welford's algorithm http://t.ly/nn_W
+    def div(self,x): # return standard deviation using Welford's algorithm http://t.ly/nn_W
         if self.m2 <0 or self.n < 2:
             return 0
         else:
