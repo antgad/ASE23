@@ -41,4 +41,4 @@ jobs:
       run: python src/tests_hw1.py
       
     - name: Run HW 2 tests
-      run: python src/main_hw2.py
+      run: cd ./src; (python main_hw2.py -g all )
