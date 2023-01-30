@@ -10,7 +10,7 @@ data.py : an example csv reader script
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
   -d  --dump  on crash, dump stack = false
-  -f  --file  name of file         = ../../etc/data/auto93.csv
+  -f  --file  name of file         = ../etc/data/auto93.csv
   -g  --go    start-up action      = data
   -h  --help  show help            = false
   -s  --seed  random number seed   = 937162211
@@ -24,9 +24,9 @@ def main(funs,saved={},fails=0):
         saved[k]=v
     if options['help']:
         print(help)
+        
     else:
-        for what,funs in funs.items():
-            print(options)
+        for what,fun in funs.items():
             if options['go'] =='all' or what ==options['go']:
                 for k, v in saved.items():
                     options[k] = v
@@ -50,7 +50,7 @@ def disp_setting():
 
 
 def test_sym():
-    sym = SYM()
+    sym = SYM.SYM()
 
     for x in ["a", "a", "a", "a", "b", "b", "c"]:
         sym.add(x)
@@ -59,7 +59,7 @@ def test_sym():
 
 
 def test_num():
-    num = NUM()
+    num = NUM.NUM()
 
     for x in [1, 1, 1, 1, 2, 2, 3]:
         num.add(x)
@@ -97,4 +97,5 @@ eg("num", "check nums", test_num)
 eg("stats", "stats from DATA", test_stats)
 eg("sym", "check syms", test_sym)
 eg("the", "show settings", disp_setting)
+
 main(egs)

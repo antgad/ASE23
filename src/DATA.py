@@ -15,7 +15,7 @@ class DATA:
             
     def add(self, t):
         if self.cols:
-            t = t if t.cells else ROW(t)
+            t = t if isinstance(t, ROW) else ROW(t)
             self.rows.append(t)
             self.cols.add(t)
         else:

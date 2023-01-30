@@ -29,12 +29,12 @@ def coerce(s):
         except ValueError:
             if s.lower()=='true':
                 return True
-            if s.lower()=='flase':
+            if s.lower()=='false':
                 return False
             return s
 
 
-def csv(sFilename, fun, src, s, t):
+def csv(sFilename, fun):
     # TODO
     
     f=io.open(sFilename)
@@ -50,7 +50,7 @@ def csv(sFilename, fun, src, s, t):
     
     pass
 
-def map(t,fun,u):
+def map():
     u=[]
     #TODO
     pass

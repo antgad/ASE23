@@ -8,7 +8,7 @@ class SYM:
     def __init__(self,at=0,txt=""): # Constructor
         self.n   = 0
         self.has = {}
-        self.most, = 0
+        self.most = 0
         self.mode = None
         self.at=at
         self.txt=txt
@@ -20,10 +20,10 @@ class SYM:
             if self.has[x] > self.most:
                 self.most, self.mode = self.has[x], x
     
-    def mid(self,x): # return the mode
+    def mid(self): # return the mode
         return self.mode
     
-    def div(self, fun,x,e): # return the entropy
+    def div(self): # return the entropy
         def fun(p): return p*log(p, 2)
         e = 0
         for _, n in self.has.items():
