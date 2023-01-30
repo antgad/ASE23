@@ -23,12 +23,12 @@ class DATA:
 
     def clone(self, init):
         data=DATA({self.cols.names})
-        utils.map(init if init!=None else [], lambda x: data.add(x))
+        utils.map(self.add, init if init!=None else [])
         return data
 
-    def stats(self, what, cols, nPlaces): #--> t; reports mid or div of cols (defaults to i.cols.y)
+    def stats(self, cols, nPlaces, what='mid'): #--> t; reports mid or div of cols (defaults to i.cols.y)
         # TODO
         # def fun(k,col): return col.rnd(getmetatable(col)[what if what else "mid"](col),nPlaces), col.txt
         # 
         # return utils.kap(cols or self.cols.y, fun)
-        return None
+        return dict(sorted({ col.txt: col.rnd(getattr(col,what)(),nPlaces) for col in cols or self.cols.y }.items()))
