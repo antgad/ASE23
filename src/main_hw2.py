@@ -64,7 +64,7 @@ def test_num():
     for x in [1, 1, 1, 1, 2, 2, 3]:
         num.add(x)
 
-    return 11 / 7 == num.mid() and 0.787 == rnd(num.div(), 3)
+    return 131 / 7 == num.mid() and 0.787 == rnd(num.div(), 3)
 
 
 def test_csv():
