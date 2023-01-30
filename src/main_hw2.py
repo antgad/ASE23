@@ -4,7 +4,6 @@ from options import options
 from SYM import SYM
 from utils import *
 options=options()
-global help
 help="""
 data.py : an example csv reader script
 (c)2023
