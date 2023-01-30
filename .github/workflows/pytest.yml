@@ -37,5 +37,5 @@ jobs:
 #     - name: Test with pytest
 #       run: |
 #         pytest
-    - name: Run tests
-      run: python src/tests.py
+    - name: Run HW 1 tests
+      run: python src/tests_hw1.py
