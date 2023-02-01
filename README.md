@@ -13,7 +13,8 @@
 
 
 This repo contains the work of Group 29 for CSC 591 Automated Software Engineering during the term Spring 2023.
-##Homeworks pushed to this repo:
+
+## Homeworks pushed to this repo:
 |Homework|Status|
 |--|--|
 | [Homework 1](https://github.com/antgad/ASE23/blob/main/src/main_hw1.py) | :heavy_check_mark: |
@@ -23,7 +24,7 @@ This repo contains the work of Group 29 for CSC 591 Automated Software Engineeri
 
 
 
-The team includes 
+The team includes: 
 Anant Gadodia
 Krish Jain
 Manasvi  Ghosalkar
