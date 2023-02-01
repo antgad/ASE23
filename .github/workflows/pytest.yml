@@ -38,7 +38,7 @@ jobs:
 #       run: |
 #         pytest
     - name: Run HW 1 tests
-      run: python src/tests_hw1.py
+      run: python src/main_hw1.py
       
     - name: Run HW 2 tests
       run: cd ./src; (python main_hw2.py -g all )
