@@ -3,15 +3,15 @@ import SYM
 import math
 import re
 import io
-
 Seed=937162211
 
 def rint(lo,hi):
     return math.floor(0.5+ rand(lo,hi))
 
 def rand(lo=0,hi=1):
+    global Seed
     Seed = (16807 * Seed) % 2147483647
-    return lo + (hi-lo) * Seed / 2147483647 
+    return lo + (hi-lo) * Seed / 2147483647  
 
 
 

@@ -16,12 +16,18 @@ def test_num():
 def test_rand():
     num1=NUM()
     num2=NUM()
-    for i in range(1,10^3):
+    for i in range(1,10**3):
         num1.add(utils.rand(0,1))
-    for i in range(1,10^3):
+
+    utils.Seed=937162211
+    for i in range(1,10**3):
         num2.add(utils.rand(0,1))
+    
     m1=utils.rnd(num1.mid(),10)
     m2=utils.rnd(num2.mid(),10)
+    print(m1)
+    print(m2)
+    print(utils.rnd(m1,1))
     assert m1==m2 and utils.rnd(m1,1)==0.5
-
+test_rand()
 
