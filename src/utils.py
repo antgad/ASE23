@@ -55,6 +55,6 @@ def map():
     #TODO
     pass
 
-def kap():
+def kap(a,b):
     # TODO
     pass
