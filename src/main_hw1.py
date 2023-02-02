@@ -68,8 +68,8 @@ def test_num():
 
 
 def test_rand():
-    num1=NUM()
-    num2=NUM()
+    num1=NUM.NUM()
+    num2=NUM.NUM()
     for i in range(1,10**3):
         num1.add(rand(0,1))
 
