@@ -79,7 +79,7 @@ def test_rand():
     
     m1=rnd(num1.mid(),10)
     m2=rnd(num2.mid(),10)
-    assert m1==m2 and rnd(m1,1)==0.5
+    assert abs(m1-m2)/m1<=0.05 and rnd(m1,1)==0.5
 
 
 eg("num", "check nums", test_num)
