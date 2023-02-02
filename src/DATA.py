@@ -1,6 +1,7 @@
 from ROW import ROW
 from COLS import COLS
 import utils
+import math
 
 class DATA:
 
@@ -26,9 +27,29 @@ class DATA:
         utils.map(self.add, init if init!=None else [])
         return data
 
-    def stats(self, cols, nPlaces, what='mid'): #--> t; reports mid or div of cols (defaults to i.cols.y)
-        # TODO
-        # def fun(k,col): return col.rnd(getmetatable(col)[what if what else "mid"](col),nPlaces), col.txt
-        # 
-        # return utils.kap(cols or self.cols.y, fun)
-        return dict(sorted({ col.txt: col.rnd(getattr(col,what)(),nPlaces) for col in cols or self.cols.y }.items()))
+    def stats(self, cols, nPlaces, what): 
+        def fun(_, col ):
+            if what=='div':
+                value= col.div()
+            else:
+                value=col.mid()
+            return col.rnd(value,nPlaces), col.txt
+
+        return utils.kap(cols or self.cols.y,fun)
+    
+    def better(self,row1,row2):
+        s1,s2=0,0
+        ys=self.cols.y
+        for key,col in ys:
+            x = col.norm(row1.cells[col.at])
+            y = col.norm(row2.cells[col.at])
+            s1 -= math.exp(col.w * (x-y)/len(ys))
+            s2 -= math.exp(col.w * (y-x)/len(ys))
+        return s1/len(ys)<s2/len(ys)
+    
+    def dist(self, row1,row2,cols):
+        n,d=0,0
+        for _,col in enumerate(cols or self.cols.x):
+            n += 1
+            d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.saved.p)
+        return math.pow((d/n),(1/self.saved.p))

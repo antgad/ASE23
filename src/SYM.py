@@ -31,4 +31,10 @@ class SYM:
         return -e
     def rnd(self,x,n):
         return x
-
+    
+    def dist(slef,s1,s2):
+        if s1=="?" and s2=="?":
+            return 1
+        if s1==s2:
+            return 0
+        return 1

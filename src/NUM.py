@@ -1,7 +1,7 @@
 # ### NUM
 # Summarizes a stream of numbers.
 
-from math import inf
+from math import inf,pow
 from utils import rnd
 
 class NUM:
@@ -36,3 +36,24 @@ class NUM:
             return x
         else:
             return rnd(x,n)
+
+    def norm(self,n):
+        if n=="?":
+            return n
+        return (n-self.lo)/(self.hi-self.lo+pow(10,-32))
+
+    def dist(self,n1,n2):
+        if n1=="?" and n2=="?":
+            return 1
+        n1,n2= self.norm(n1),self.norm(n2)
+        if n1=="?":
+            if n2<0.5:
+                n1=1
+            else:
+                n1=0
+        if n2=="?":
+            if n1<0.5:
+                n2=1
+            else:
+                n2=0
+        
