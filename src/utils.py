@@ -29,7 +29,7 @@ def cosine(a,b,c):
 
 ## Lists
 
-def map(t, fun):
+def map(t, fun): 
     u={}
     for k, v in enumerate(t):
         v, k = fun(v)
@@ -44,10 +44,11 @@ def kap(t, fun):
     u={}
     for k, v in enumerate(t):
         v, k = fun(k, v)
-    if k:
-        u[k] = v
-    else:
-        u[1 + len(u)] = v
+        if v!=None:
+            if k:
+                u[k] = v
+            else:
+                u[1 + len(u)] = v
     return u
 
 def lt(x):
@@ -55,6 +56,14 @@ def lt(x):
 
 def keys(t):
     return sorted(kap(t, lambda k, _: k))
+
+def any(t): return t[rint(0,len(t))]
+
+def many(t,n): 
+    u=[]
+    for _ in range(n):
+        u.append(any(t)) 
+    return u
 
 '''
 function map(t, fun,     u) --> t; map a function `fun`(v) over list (skip nil results) --DONE
@@ -69,16 +78,16 @@ function sort(t, fun) --> t; return `t`,  sorted by `fun` (default= `<`) --Inbui
 function lt(x) --> fun;  return a function that sorts ascending on `x` -- DONE
   return function(a,b) return a[x] < b[x] end end
 
-function keys(t) --> ss; return list of table keys, sorted
+function keys(t) --> ss; return list of table keys, sorted -- Doubts
   return sort(kap(t, function(k,_) return k end)) end
 
-function push(t, x) --> any; push `x` to end of list; return `x` 
+function push(t, x) --> any; push `x` to end of list; return `x`  --Inbuilt
   table.insert(t,x); return x end
 
-function push(t, x) --> any; push `x` to end of list; return `x` 
+function push(t, x) --> any; push `x` to end of list; return `x`   --Inbuilt
   table.insert(t,x); return x end
 
-function any(t) return t[rint(#t)] end  --> x; returns one items at random
+function any(t) return t[rint(#t)] end  --> x; returns one items at random --DONE
 
 function many(t,n,    u)  --> t1; returns some items from `t`
    u={}; for i=1,n do u[1+#u]=any(t) end; return u end
