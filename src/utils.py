@@ -50,6 +50,12 @@ def kap(t, fun):
         u[1 + len(u)] = v
     return u
 
+def lt(x):
+    return lambda a, b: a[x] < b[x]
+
+def keys(t):
+    return sorted(kap(t, lambda k, _: k))
+
 '''
 function map(t, fun,     u) --> t; map a function `fun`(v) over list (skip nil results) --DONE
   u={}; for k,v in pairs(t) do v,k=fun(v); u[k or (1+#u)]=v end;  return u end
@@ -60,7 +66,7 @@ function kap(t, fun,     u) --> t; map function `fun`(k,v) over list (skip nil r
 function sort(t, fun) --> t; return `t`,  sorted by `fun` (default= `<`) --Inbuilt
   table.sort(t,fun); return t end
 
-function lt(x) --> fun;  return a function that sorts ascending on `x`
+function lt(x) --> fun;  return a function that sorts ascending on `x` -- DONE
   return function(a,b) return a[x] < b[x] end end
 
 function keys(t) --> ss; return list of table keys, sorted
