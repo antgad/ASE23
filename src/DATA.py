@@ -28,7 +28,7 @@ class DATA:
             self.cols = COLS(t)
 
     def clone(self, init):
-        data=DATA({self.cols.names})
+        data=DATA(list(self.cols.names))
         utils.map(self.add, init if init!=None else [])
         return data
 
@@ -94,8 +94,21 @@ class DATA:
         cols=cols if cols else self.cols
         node={'data':self.clone(rows)}
         if len(rows)>2*min:
-            left,right,node.A,node.b,node.mid=self.half(rows,cols,above)
+            left,right,node['A'],node['B'],node.mid=self.half(rows,cols,above)
             node['left']= self.cluster(left,min,cols,node['A'])
             node['right']= self.cluster(right,min,cols,node['B'])
+        return node
+    
+    def sway(self,rows=None, min=None, cols=None, above=None):
+        rows= rows if rows else self.rows()
+
+        min=min if min else self.min
+        cols=cols if cols else self.cols
+        node={'data':self.clone(rows)}
+        if len(rows)>2*min:
+            left,right,node['A'],node['B'],node.mid=self.half(rows,cols,above)
+            if self.better(node.B,node.A):
+                left,right,node['A'],node['B'] = right,left,node['B'],node['A']
+            node['left']=self.sway(left,min,cols,node["A"])
         return node
             

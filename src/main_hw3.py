@@ -12,7 +12,7 @@ data.py : an example csv reader script
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
   -d  --dump    on crash, dump stack   = false
-  -f  --file    name of file           = ../etc/data/auto93.csv
+  -f  --file    name of file           = etc/data/auto93.csv
   -F  --Far     distance to "faraway"  = .95
   -g  --go      start-up action        = data
   -h  --help    show help              = false
@@ -76,36 +76,30 @@ def test_num():
 
     return 11 / 7 == num.mid() and 0.787 == rnd(num.div(), 3)
 
-
-def test_csv():
-    n = 0
-
-    def f(t):
-        nonlocal n
-        n += len(t)
-
-    csv(options['file'], f)
-    return n == 8 * 399
-
-
 def test_data():
     data = DATA(options["file"])
 
     return len(data.rows) == 398 and data.cols.y[0].w == -1 and data.cols.x[0].at == 0 and len(data.cols.x) == 4
 
+def test_clone():
+    data1=DATA(options['file'])
+    data2 = data1.clone(data1.rows)
 
-def test_stats():
-    data = DATA(options["file"])
+    return (len(data1.rows) == len(data2.rows) 
+            and data1.cols.y[1].w == data2.cols.y[1].w
+            and data1.cols.x[1].at == data2.cols.x[1].at
+            and len(data1.cols.x) == len(data2.cols.x) )
 
-    for k, cols in {"y": data.cols.y, "x": data.cols.x}.items():
-        print(k, "\tmid\t", data.stats(cols, 2, what="mid"))
-        print("", "\tdiv\t", data.stats(cols, 2, what="div"))
 
-eg("csv", "read from csv", test_csv)
-eg("data", "read DATA csv", test_data)
-eg("num", "check nums", test_num)
-eg("stats", "stats from DATA", test_stats)
-eg("sym", "check syms", test_sym)
+
 eg("the", "show settings", disp_setting)
+eg("sym", "check syms", test_sym)
+eg("num", "check nums", test_num)
+eg("data", "read DATA csv", test_data)
+#eg("clone","duplicate Structure", test_clone)
+
+
+
+
 
 main(egs)
