@@ -1,6 +1,6 @@
 from DATA import DATA
 from NUM import NUM
-from OPTIONS import OPTIONS
+import OPTIONS
 from SYM import SYM
 from utils import *
 options=OPTIONS.OPTIONS()
