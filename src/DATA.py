@@ -2,7 +2,7 @@ from ROW import ROW
 from COLS import COLS
 import utils
 import math
-import OPTIONS
+
 import json
 
 class DATA:
@@ -56,7 +56,7 @@ class DATA:
         n,d=0,0
         for _,col in enumerate(cols or self.cols.x):
             n += 1
-            d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),OPTIONS)
+            d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.config.p)
         return math.pow((d/n),(1/self.config.p))
     
     def around(self,row1,rows,cols):
