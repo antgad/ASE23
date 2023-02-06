@@ -1,19 +1,25 @@
 from DATA import DATA
 from NUM import NUM
-from options import options
+import OPTIONS
 from SYM import SYM
+import os
 from utils import *
-options=options()
+import json
+options=OPTIONS.OPTIONS()
 help="""
 data.py : an example csv reader script
 (c)2023
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
-  -d  --dump  on crash, dump stack = false
-  -f  --file  name of file         = ../etc/data/auto93.csv
-  -g  --go    start-up action      = data
-  -h  --help  show help            = false
-  -s  --seed  random number seed   = 937162211
+  -d  --dump    on crash, dump stack   = false
+  -f  --file    name of file           = ../etc/data/auto93.csv
+  -F  --Far     distance to "faraway"  = .95
+  -g  --go      start-up action        = data
+  -h  --help    show help              = false
+  -m  --min     stop clusters at N^min = .5
+  -p  --p       distance coefficient   = 2
+  -s  --seed    random number seed     = 937162211
+  -S  --Sample  sampling data size     = 512
 ACTIONS:
 """
 
@@ -22,9 +28,11 @@ def main(funs,saved={},fails=0):
     options.cli_setting(help)
     for k,v in options.items():
         saved[k]=v
+    with open("config.json", "w") as outfile:
+        json.dump(saved, outfile)
     if options['help']:
         print(help)
-        
+    
     else:
         for what,fun in funs.items():
             if options['go'] =='all' or what ==options['go']:
@@ -36,6 +44,9 @@ def main(funs,saved={},fails=0):
                     print("❌ fail:", what)
                 else:
                     print("✅ pass:", what)
+
+    os.remove('config.json')
+    
     exit(fails)
 
 egs = {}
