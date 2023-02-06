@@ -3,6 +3,8 @@ from NUM import NUM
 import OPTIONS
 from SYM import SYM
 from utils import *
+import json
+import os
 options=OPTIONS.OPTIONS()
 help="""
 data.py : an example csv reader script
@@ -22,6 +24,8 @@ def main(funs,saved={},fails=0):
     options.cli_setting(help)
     for k,v in options.items():
         saved[k]=v
+    with open("config.json", "w") as outfile:
+        json.dump(saved, outfile)
     if options['help']:
         print(help)
         
@@ -36,6 +40,7 @@ def main(funs,saved={},fails=0):
                     print("❌ fail:", what)
                 else:
                     print("✅ pass:", what)
+    os.remove('config.json')
     exit(fails)
 
 egs = {}

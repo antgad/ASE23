@@ -12,7 +12,7 @@ data.py : an example csv reader script
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
   -d  --dump    on crash, dump stack   = false
-  -f  --file    name of file           = ../etc/data/auto93.csv
+  -f  --file    name of file           = etc/data/auto93.csv
   -F  --Far     distance to "faraway"  = .95
   -g  --go      start-up action        = data
   -h  --help    show help              = false
@@ -46,7 +46,6 @@ def main(funs,saved={},fails=0):
                     print("✅ pass:", what)
 
     os.remove('config.json')
-    
     exit(fails)
 
 egs = {}
