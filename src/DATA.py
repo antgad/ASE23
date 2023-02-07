@@ -43,7 +43,7 @@ class DATA:
         # utils.map(init if init!=None else [], lambda x: data.add(x))
         return data
 
-    def stats(self, what, cols, nPlaces): 
+    def stats(self, cols, nPlaces, what): 
         def fun(_, col ):
             if what=='div':
                 value= col.div()

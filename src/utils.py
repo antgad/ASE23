@@ -14,7 +14,7 @@ def show(node, what, cols, nPlaces, lvl=0):
         print("| "*lvl + str(len(node['data'].rows)), end= "  ")
         if (not node.get('left')) or (lvl==0):
             # print("in o")
-            print(o(node['data'].stats("mid",node['data'].cols.y,nPlaces)))
+            print(o(node['data'].stats(node['data'].cols.y,nPlaces, what="mid")))
             # print('out of o')
         else: 
             print("")
