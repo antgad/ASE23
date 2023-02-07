@@ -12,7 +12,7 @@ data.py : an example csv reader script
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
   -d  --dump    on crash, dump stack   = false
-  -f  --file    name of file           = ../etc/data/auto93.csv
+  -f  --file    name of file           = ./etc/data/auto93.csv
   -F  --Far     distance to "faraway"  = .95
   -g  --go      start-up action        = data
   -h  --help    show help              = false
@@ -94,6 +94,24 @@ def test_clone():
             and data1.cols.y[1].w == data2.cols.y[1].w
             and data1.cols.x[1].at == data2.cols.x[1].at
             and len(data1.cols.x) == len(data2.cols.x) )
+def test_around():
+    data=DATA(options['file'])
+    print(0,0,data.rows[0].cells)
+    for n,t in enumerate(data.around(data.rows[1])):
+        if n%50==0:
+            print(n,rnd(t['dist'],2),t['row'].cells)
+
+def test_half():
+    data=DATA(options['file'])
+    left,right,A,B,mid,C=data.half()
+    print("Left: ",str(len(left)))
+    print("Right: ",str(len(right)))
+    print("Rows: ",str(len(data.rows)))
+    print("A: ",str(A.cells))
+    print("C: ",str(C))
+    print("mid: ",str(mid.cells))
+    print("B: ",str(B.cells))
+    
 
 
 
@@ -102,6 +120,8 @@ eg("sym", "check syms", test_sym)
 eg("num", "check nums", test_num)
 eg("data", "read DATA csv", test_data)
 eg("clone","duplicate Structure", test_clone)
+eg("around","sorting nearest neighbours",test_around)
+eg("half","1-level bi-clustering",test_half)
 
 
 

@@ -4,6 +4,7 @@
 from math import inf,pow
 from utils import rnd
 
+
 class NUM:
 
     def __init__(self, at = 0, txt = ""):
@@ -56,4 +57,4 @@ class NUM:
                 n2=1
             else:
                 n2=0
-        
+        return abs(n1-n2)

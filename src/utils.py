@@ -57,7 +57,7 @@ def lt(x):
 def keys(t):
     return sorted(kap(t, lambda k, _: k))
 
-def any(t): return t[rint(0,len(t))]
+def any(t): return t[rint(0,len(t)-1)]
 
 def many(t,n): 
     u=[]

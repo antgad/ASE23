@@ -63,34 +63,34 @@ class DATA:
             s2 -= math.exp(col.w * (y-x)/len(ys))
         return s1/len(ys)<s2/len(ys)
     
-    def dist(self, row1,row2,cols):
+    def dist(self, row1,row2,cols=None):
         n,d=0,0
         for _,col in enumerate(cols or self.cols.x):
             n += 1
-            d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.config.p)
-        return math.pow((d/n),(1/self.config.p))
+            d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.config['p'])
+        return math.pow((d/n),(1/self.config['p']))
     
-    def around(self,row1,rows,cols):
+    def around(self,row1,rows=None,cols=None):
         rows = rows if rows else self.rows
-        cols =  cols if cols else self.cols
+        cols =  cols if cols else self.cols.x
         def fun(row2):
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
         return sorted(list(map(fun,rows)),key=lambda k: k['dist'])
 
-    def half(self,rows,cols,above):
+    def half(self,rows=None,cols=None,above=None):
         def project(row):
-            return {"row": row, "dist": math.cosine(dist(row,A),dist(row,B),C)}
+            return {"row": row, "dist": utils.cosine(dist(row,A),dist(row,B),C)}
         
         def dist(row1,row2):
             return self.dist(row1,row2,cols)
         rows = rows if rows else self.rows
-        some = utils.many(rows,self.config.Sample)
+        some = utils.many(rows,self.config['Sample'])
         A = above or utils.any(some)
-        B = self.around(A,some)[self.config.Far * len(rows)//1].row
+        B = self.around(A,some)[int(self.config['Far'] * len(rows))]['row']
         C = dist(A,B)
         left,right=[],[]
         mid=None
-        for n,temp in enumerate(sorted(map(rows,project),key = lambda k:k['dist'])):
+        for n,temp in enumerate(sorted(map(project,rows),key = lambda k:k['dist'])):
             if n<len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
