@@ -2,7 +2,7 @@ import re
 import sys
 from utils import coerce
 
-class options:
+class OPTIONS:
     
     def __init__(self):
         self.t={}

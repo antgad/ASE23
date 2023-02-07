@@ -1,9 +1,9 @@
 from DATA import DATA
 from NUM import NUM
-from options import options
+import OPTIONS
 from SYM import SYM
 from utils import *
-options=options()
+options=OPTIONS.OPTIONS()
 help="""
 data.py : an example csv reader script
 (c)2023
