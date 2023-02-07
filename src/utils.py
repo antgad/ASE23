@@ -9,13 +9,10 @@ import io
 ## Show
 def show(node, what, cols, nPlaces, lvl=0):
     if node:
-        # lvl = lvl or 0
         # io.write("| "*lvl + str(node.data.rows) + "  ")
         print("| "*lvl + str(len(node['data'].rows)), end= "  ")
         if (not node.get('left')) or (lvl==0):
-            # print("in o")
             print(o(node['data'].stats(node['data'].cols.y,nPlaces, what="mid")))
-            # print('out of o')
         else: 
             print("")
         show(node.get('left'), what,cols, nPlaces, lvl+1)
@@ -90,15 +87,11 @@ def oo(t):
     print(o(t))
     return t 
 
+
 def o(t, isKeys=None):
-    # print("o(t)", t, type(t))
-    # print("if condition:", type(t)!=list and type(t)!=dict)
     if type(t)!=list and type(t)!=dict:
         return str(t)
-    
-    # print("list or dict")
     def fun(k, v):
-        # print()
         if "^_" not in str(k):
             return str(f':{o(k)} {o(v)} '), k
     if type(t)==list:
@@ -106,11 +99,6 @@ def o(t, isKeys=None):
     else:
         temp = kap(t, fun)
         return str("{" + " ".join([str(temp[k]) for k in sorted(temp)]))
-    # if not isKeys and len(t)>0:
-    #     temp = map(t, o)
-    # else:
-    #     temp = sorted(kap(t, fun))
-    # return str({k:temp[k] for k in sorted(temp)})
     
 
 def coerce(s):
@@ -128,8 +116,6 @@ def coerce(s):
 
 
 def csv(sFilename, fun):
-    # TODO
-    
     f=io.open(sFilename)
     while True:
         s=f.readline().rstrip()

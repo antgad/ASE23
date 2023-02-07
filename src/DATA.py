@@ -6,7 +6,9 @@ import math
 import json
 
 class DATA:
-
+    """
+        Store many rows, summarized into columns
+    """
     def __init__(self, src):
         self.rows = []
         self.cols = None
@@ -15,34 +17,27 @@ class DATA:
             self.config = json.load(json_file)
         def fun(x): 
             self.add(x)
-        # print("src =", src)
         if type(src)==str:
             utils.csv(src, fun)
         else:
-            # print("mapping, ", src)
             list(map(self.add , src if src != None else []))
-            # for row in src:
-            #     self.add(row)
-            # print(self.cols.names)
-            # utils.map(src if src != None else [], fun)
-            
+    
+
     def add(self, t):
-        # print("adding ", t)
-        # print("init cols=", self.cols)
         if self.cols:
             t = t if isinstance(t, ROW) else ROW(t)
-            # print(t)
             self.rows.append(t)
             self.cols.add(t)
         else:
             self.cols = COLS(t)
+    
 
     def clone(self, init):
         data = DATA([self.cols.names])
         list(map(lambda x: data.add(x), init if init!=None else []))
-        # utils.map(init if init!=None else [], lambda x: data.add(x))
         return data
-
+    
+    
     def stats(self, cols, nPlaces, what): 
         def fun(_, col ):
             if what=='div':
@@ -50,9 +45,9 @@ class DATA:
             else:
                 value=col.mid()
             return col.rnd(value,nPlaces), col.txt
-        # print(cols or self.cols.y)
         return utils.kap(cols or self.cols.y,fun)
     
+
     def better(self,row1,row2):
         s1,s2=0,0
         ys=self.cols.y
@@ -63,6 +58,7 @@ class DATA:
             s2 -= math.exp(col.w * (y-x)/len(ys))
         return s1/len(ys)<s2/len(ys)
     
+
     def dist(self, row1,row2,cols=None):
         n,d=0,0
         for _,col in enumerate(cols or self.cols.x):
@@ -70,13 +66,15 @@ class DATA:
             d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.config['p'])
         return math.pow((d/n),(1/self.config['p']))
     
+
     def around(self,row1,rows=None,cols=None):
         rows = rows if rows else self.rows
         cols =  cols if cols else self.cols.x
         def fun(row2):
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
         return sorted(list(map(fun,rows)),key=lambda k: k['dist'])
-
+    
+    
     def half(self,rows=None,cols=None,above=None):
         def project(row):
             return {"row": row, "dist": utils.cosine(dist(row,A),dist(row,B),C)}
