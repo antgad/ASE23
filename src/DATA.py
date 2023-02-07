@@ -56,7 +56,7 @@ class DATA:
     def better(self,row1,row2):
         s1,s2=0,0
         ys=self.cols.y
-        for key,col in ys:
+        for col in ys:
             x = col.norm(row1.cells[col.at])
             y = col.norm(row2.cells[col.at])
             s1 -= math.exp(col.w * (x-y)/len(ys))
@@ -98,6 +98,7 @@ class DATA:
                 right.append(temp['row'])
         return left,right,A,B,mid,C
 
+
     def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
 
@@ -111,15 +112,15 @@ class DATA:
             node['right']= self.cluster(right,min,cols,node['B'])
         return node
     
-    def sway(self,rows=None, min=None, cols=None, above=None):
-        rows= rows if rows else self.rows
 
-        min=min if min else self.min
-        cols=cols if cols else self.cols
-        node={'data':self.clone(rows)}
+    def sway(self,rows=None, min=None, cols=None, above=None):
+        rows = rows if rows else self.rows
+        min = min if min else len(rows)**self.config['min']
+        cols = cols if cols else self.cols.x
+        node = {'data':self.clone(rows)}
         if len(rows)>2*min:
-            left,right,node['A'],node['B'],node.mid=self.half(rows,cols,above)
-            if self.better(node.B,node.A):
+            left,right,node['A'],node['B'],node['mid'], _=self.half(rows,cols,above)
+            if self.better(node['B'],node['A']):
                 left,right,node['A'],node['B'] = right,left,node['B'],node['A']
             node['left']=self.sway(left,min,cols,node["A"])
         return node

@@ -40,7 +40,7 @@ def rnd(n,nPlaces=3):
 def cosine(a,b,c):
     x1 = (a**2 + c**2 - b**2)/(2*c)
     x2 = max(0, min(1, x1))
-    y = (a**2 - x2**2)**0.5
+    y = (abs(a**2 - x2**2))**0.5
     return x2, y
 
 ## Lists

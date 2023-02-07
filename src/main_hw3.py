@@ -82,25 +82,20 @@ def test_data():
     return len(data.rows) == 398 and data.cols.y[0].w == -1 and data.cols.x[0].at == 0 and len(data.cols.x) == 4
 
 def test_clone():
-    data1=DATA(options['file'])
-    # print("Cloning")
+    data1 = DATA(options['file'])
     data2 = data1.clone(data1.rows)
-    # print(len(data1.rows) == len(data2.rows) )
-    # print(data1.cols.y[1].w == data2.cols.y[1].w)
-    # print(data1.cols.x[1].at == data2.cols.x[1].at)
-    # print(len(data1.cols.x) == len(data2.cols.x))
-
+    
     return (len(data1.rows) == len(data2.rows) 
             and data1.cols.y[1].w == data2.cols.y[1].w
             and data1.cols.x[1].at == data2.cols.x[1].at
             and len(data1.cols.x) == len(data2.cols.x) )
 
 def test_around():
-    data=DATA(options['file'])
-    print(0,0,data.rows[0].cells)
+    data = DATA(options['file'])
+    print(0, 0, data.rows[0].cells)
     for n,t in enumerate(data.around(data.rows[1])):
         if n%50==0:
-            print(n,rnd(t['dist'],2),t['row'].cells)
+            print(n, rnd(t['dist'],2), t['row'].cells)
 
 def test_half():
     data=DATA(options['file'])
@@ -114,12 +109,12 @@ def test_half():
     print("B: ",str(B.cells))
     
 def test_cluster():
-    data=DATA(options['file'])
-    show(data.cluster(),"mid",data.cols.y,1)
+    data = DATA(options['file'])
+    show(data.cluster(), "mid", data.cols.y, 1)
 
 def test_sway():
-    data=DATA(options['file'])
-    show(data.sway(),"mid",data.cols.y,1)
+    data = DATA(options['file'])
+    show(data.sway(), "mid", data.cols.y, 1)
 
 
 eg("the", "show settings", disp_setting)
@@ -130,7 +125,7 @@ eg("clone","duplicate Structure", test_clone)
 eg("around","sorting nearest neighbours",test_around)
 eg("half","1-level bi-clustering",test_half)
 eg("cluster", "N-level bi-clustering", test_cluster)
-# eg("optimize", "semi-supervised optimization", test_sway)
+eg("optimize", "semi-supervised optimization", test_sway)
 
 
 
