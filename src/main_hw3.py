@@ -12,7 +12,7 @@ data.py : an example csv reader script
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
   -d  --dump    on crash, dump stack   = false
-  -f  --file    name of file           = ./etc/data/auto93.csv
+  -f  --file    name of file           = ../etc/data/auto93.csv
   -F  --Far     distance to "faraway"  = .95
   -g  --go      start-up action        = data
   -h  --help    show help              = false
@@ -94,6 +94,7 @@ def test_clone():
             and data1.cols.y[1].w == data2.cols.y[1].w
             and data1.cols.x[1].at == data2.cols.x[1].at
             and len(data1.cols.x) == len(data2.cols.x) )
+
 def test_around():
     data=DATA(options['file'])
     print(0,0,data.rows[0].cells)
@@ -112,7 +113,13 @@ def test_half():
     print("mid: ",str(mid.cells))
     print("B: ",str(B.cells))
     
+def test_cluster():
+    data=DATA(options['file'])
+    show(data.cluster(),"mid",data.cols.y,1)
 
+def test_sway():
+    data=DATA(options['file'])
+    show(data.sway(),"mid",data.cols.y,1)
 
 
 eg("the", "show settings", disp_setting)
@@ -122,8 +129,8 @@ eg("data", "read DATA csv", test_data)
 eg("clone","duplicate Structure", test_clone)
 eg("around","sorting nearest neighbours",test_around)
 eg("half","1-level bi-clustering",test_half)
-
-
+eg("cluster", "N-level bi-clustering", test_cluster)
+# eg("optimize", "semi-supervised optimization", test_sway)
 
 
 

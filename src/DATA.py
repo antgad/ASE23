@@ -43,14 +43,14 @@ class DATA:
         # utils.map(init if init!=None else [], lambda x: data.add(x))
         return data
 
-    def stats(self, cols, nPlaces, what): 
+    def stats(self, what, cols, nPlaces): 
         def fun(_, col ):
             if what=='div':
                 value= col.div()
             else:
                 value=col.mid()
             return col.rnd(value,nPlaces), col.txt
-
+        # print(cols or self.cols.y)
         return utils.kap(cols or self.cols.y,fun)
     
     def better(self,row1,row2):
@@ -99,19 +99,20 @@ class DATA:
         return left,right,A,B,mid,C
 
     def cluster(self,rows=None,min=None,cols=None,above=None):
-        rows= rows if rows else self.rows()
+        rows= rows if rows else self.rows
 
-        min=min if min else self.min
-        cols=cols if cols else self.cols
+        min=min if min else len(rows)**self.config['min']
+        cols=cols if cols else self.cols.x
         node={'data':self.clone(rows)}
         if len(rows)>2*min:
-            left,right,node['A'],node['B'],node.mid=self.half(rows,cols,above)
+            
+            left,right,node['A'],node['B'],node['mid'], _=self.half(rows,cols,above)
             node['left']= self.cluster(left,min,cols,node['A'])
             node['right']= self.cluster(right,min,cols,node['B'])
         return node
     
     def sway(self,rows=None, min=None, cols=None, above=None):
-        rows= rows if rows else self.rows()
+        rows= rows if rows else self.rows
 
         min=min if min else self.min
         cols=cols if cols else self.cols

@@ -6,6 +6,22 @@ import math
 import re
 import io
 
+## Show
+def show(node, what, cols, nPlaces, lvl=0):
+    if node:
+        # lvl = lvl or 0
+        # io.write("| "*lvl + str(node.data.rows) + "  ")
+        print("| "*lvl + str(len(node['data'].rows)), end= "  ")
+        if (not node.get('left')) or (lvl==0):
+            # print("in o")
+            print(o(node['data'].stats("mid",node['data'].cols.y,nPlaces)))
+            # print('out of o')
+        else: 
+            print("")
+        show(node.get('left'), what,cols, nPlaces, lvl+1)
+        show(node.get('right'), what,cols,nPlaces, lvl+1)
+
+
 ## Numerics
 Seed=937162211
 
@@ -42,7 +58,9 @@ def map(t, fun):
 
 def kap(t, fun):
     u={}
-    for k, v in enumerate(t):
+    if type(t)!=dict:
+        t = dict(enumerate(t))
+    for k, v in t.items():
         v, k = fun(k, v)
         if v!=None:
             if k:
@@ -73,16 +91,26 @@ def oo(t):
     return t 
 
 def o(t, isKeys=None):
-    if type(t)!=list:
+    # print("o(t)", t, type(t))
+    # print("if condition:", type(t)!=list and type(t)!=dict)
+    if type(t)!=list and type(t)!=dict:
         return str(t)
+    
+    # print("list or dict")
     def fun(k, v):
-        if not str(k).find("^_"):
-            return f':{o(k)} {o(v)}'
-    if not isKeys and len(t)>0:
-        temp = map(t, o)
+        # print()
+        if "^_" not in str(k):
+            return str(f':{o(k)} {o(v)} '), k
+    if type(t)==list:
+        return "{"+" ".join([str(i) for i in t]) +"}"
     else:
-        temp = sorted(kap(t, fun))
-    return str({k:temp[k] for k in sorted(temp)})
+        temp = kap(t, fun)
+        return str("{" + " ".join([str(temp[k]) for k in sorted(temp)]))
+    # if not isKeys and len(t)>0:
+    #     temp = map(t, o)
+    # else:
+    #     temp = sorted(kap(t, fun))
+    # return str({k:temp[k] for k in sorted(temp)})
     
 
 def coerce(s):
