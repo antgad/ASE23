@@ -12,7 +12,7 @@ data.py : an example csv reader script
 USAGE:   data.py  [OPTIONS] [-g ACTION]
 OPTIONS:
   -d  --dump    on crash, dump stack   = false
-  -f  --file    name of file           = etc/data/auto93.csv
+  -f  --file    name of file           = ../etc/data/auto93.csv
   -F  --Far     distance to "faraway"  = .95
   -g  --go      start-up action        = data
   -h  --help    show help              = false
@@ -96,7 +96,7 @@ eg("the", "show settings", disp_setting)
 eg("sym", "check syms", test_sym)
 eg("num", "check nums", test_num)
 eg("data", "read DATA csv", test_data)
-#eg("clone","duplicate Structure", test_clone)
+eg("clone","duplicate Structure", test_clone)
 
 
 
