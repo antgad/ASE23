@@ -13,23 +13,34 @@ class DATA:
         self.config={}
         with open('config.json') as json_file:
             self.config = json.load(json_file)
-        def fun(x): self.add(x)
+        def fun(x): 
+            self.add(x)
+        # print("src =", src)
         if type(src)==str:
             utils.csv(src, fun)
         else:
-            utils.map(src if src != None else [], fun)
+            # print("mapping, ", src)
+            list(map(self.add , src if src != None else []))
+            # for row in src:
+            #     self.add(row)
+            # print(self.cols.names)
+            # utils.map(src if src != None else [], fun)
             
     def add(self, t):
+        # print("adding ", t)
+        # print("init cols=", self.cols)
         if self.cols:
             t = t if isinstance(t, ROW) else ROW(t)
+            # print(t)
             self.rows.append(t)
             self.cols.add(t)
         else:
             self.cols = COLS(t)
 
     def clone(self, init):
-        data=DATA(list(self.cols.names))
-        utils.map(self.add, init if init!=None else [])
+        data = DATA([self.cols.names])
+        list(map(lambda x: data.add(x), init if init!=None else []))
+        # utils.map(init if init!=None else [], lambda x: data.add(x))
         return data
 
     def stats(self, cols, nPlaces, what): 
