@@ -65,35 +65,25 @@ def many(t,n):
         u.append(any(t)) 
     return u
 
-'''
-function map(t, fun,     u) --> t; map a function `fun`(v) over list (skip nil results) --DONE
-  u={}; for k,v in pairs(t) do v,k=fun(v); u[k or (1+#u)]=v end;  return u end
- 
-function kap(t, fun,     u) --> t; map function `fun`(k,v) over list (skip nil results) --DONE
-  u={}; for k,v in pairs(t) do v,k=fun(k,v); u[k or (1+#u)]=v; end; return u end
-
-function sort(t, fun) --> t; return `t`,  sorted by `fun` (default= `<`) --Inbuilt
-  table.sort(t,fun); return t end
-
-function lt(x) --> fun;  return a function that sorts ascending on `x` -- DONE
-  return function(a,b) return a[x] < b[x] end end
-
-function keys(t) --> ss; return list of table keys, sorted -- Doubts
-  return sort(kap(t, function(k,_) return k end)) end
-
-function push(t, x) --> any; push `x` to end of list; return `x`  --Inbuilt
-  table.insert(t,x); return x end
-
-function push(t, x) --> any; push `x` to end of list; return `x`   --Inbuilt
-  table.insert(t,x); return x end
-
-function any(t) return t[rint(#t)] end  --> x; returns one items at random --DONE
-
-function many(t,n,    u)  --> t1; returns some items from `t`
-   u={}; for i=1,n do u[1+#u]=any(t) end; return u end
-'''
 
 ## Strings
+
+def oo(t): 
+    print(o(t))
+    return t 
+
+def o(t, isKeys=None):
+    if type(t)!=list:
+        return str(t)
+    def fun(k, v):
+        if not str(k).find("^_"):
+            return f':{o(k)} {o(v)}'
+    if not isKeys and len(t)>0:
+        temp = map(t, o)
+    else:
+        temp = sorted(kap(t, fun))
+    return str({k:temp[k] for k in sorted(temp)})
+    
 
 def coerce(s):
     try:
@@ -122,5 +112,4 @@ def csv(sFilename, fun):
             fun(t)
         else:
             return f.close()
-    
-    pass
+
