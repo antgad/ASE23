@@ -2,36 +2,16 @@
 
 import NUM
 import SYM
+import ROW
 import math
 import re
 import io
 from copy import deepcopy
+import json
 
 ## Show
 
-def repCols(cols):
-    #TODO
-    cols=copy(cols)
-    # for _,col in pairs(cols) do
-    #     col[#col] = col[1]..":"..col[#col]
-    #     for j=2,#col do col[j-1] = col[j] end
-    #     col[#col]=nil end 
-    # table.insert(cols,1,kap(cols[1], function(k,v) return "Num"..k end))
-    # cols[1][#cols[1]]="thingX"
-    # return DATA(cols)
-
-# function repCols(cols)
-#   cols=copy(cols)
-#   for _,col in pairs(cols) do
-#     col[#col] = col[1]..":"..col[#col]
-#     for j=2,#col do col[j-1] = col[j] end
-#     col[#col]=nil end 
-#   table.insert(cols,1,kap(cols[1], function(k,v) return "Num"..k end))
-#   cols[1][#cols[1]]="thingX"
-#   return DATA(cols)
-#   end
-
-def show(node, what, cols, nPlaces, lvl=0):
+def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
         # io.write("| "*lvl + str(node.data.rows) + "  ")
         print("| "*lvl + str(len(node['data'].rows)), end= "  ")
@@ -43,6 +23,19 @@ def show(node, what, cols, nPlaces, lvl=0):
         show(node.get('right'), what,cols,nPlaces, lvl+1)
 
 
+def show_grid(node, what=None, cols=None, nPlaces=1, lvl=0):
+    if node:
+        # io.write("| "*lvl + str(node.data.rows) + "  ")
+        print("| "*lvl, end=" ")#+ str(len(node['data'].rows)), end= "  ")
+        if (not node.get('left')):
+            print(o(node['data'].rows[-1].cells[-1]))
+        else: 
+            print("", rnd(100*node['c']))
+        show_grid(node.get('left'), what,cols, nPlaces, lvl+1)
+        show_grid(node.get('right'), what,cols,nPlaces, lvl+1)
+
+
+# print(not node.left and  o(last(last(node.data.rows).cells))  or fmt("%.f",rnd(100*node.c)))
 ## Numerics
 Seed=937162211
 
@@ -59,6 +52,8 @@ def rnd(n,nPlaces=3):
     return math.floor(n*mult+0.5)/mult
 
 def cosine(a,b,c):
+    c = 1e-5 if c==0 else c
+    # print(c)
     x1 = (a**2 + c**2 - b**2)/(2*c)
     x2 = max(0, min(1, x1))
     y = (abs(a**2 - x2**2))**0.5
@@ -66,16 +61,16 @@ def cosine(a,b,c):
 
 ## Lists
 
-def map(t, fun): 
-    u={}
-    for k, v in enumerate(t):
-        v, k = fun(v)
-        if v!=None:
-            if k:
-                u[k] = v
-            else:
-                u[1 + len(u)] = v
-    return u
+# def map(t, fun): 
+#     u={}
+#     for k, v in enumerate(t):
+#         v, k = fun(v)
+#         if v!=None:
+#             if k:
+#                 u[k] = v
+#             else:
+#                 u[1 + len(u)] = v
+#     return u
 
 def kap(t, fun):
     u={}
@@ -118,6 +113,10 @@ def oo(t):
 
 
 def o(t, isKeys=None):
+    type_t = type(t)
+    if type_t==NUM.NUM or type_t==SYM.SYM or type_t==ROW.ROW:
+        t = vars(t)
+        t['a'] = str(type_t)
     if type(t)!=list and type(t)!=dict:
         return str(t)
     def fun(k, v):
@@ -127,7 +126,7 @@ def o(t, isKeys=None):
         return "{"+" ".join([str(i) for i in t]) +"}"
     else:
         temp = kap(t, fun)
-        return str("{" + " ".join([str(temp[k]) for k in sorted(temp)]))
+        return str("{" + " ".join([str(temp[k]) for k in sorted(temp)]) + "}")
     
 
 def coerce(s):
@@ -156,7 +155,35 @@ def csv(sFilename, fun):
         else:
             return f.close()
 
-def dofile(sFilename):
-    #TODO
-    data_dict = {}
-    return data_dict
+def dofile(filename = 'repgrid1.csv'):
+    """
+        Function to read data from repgrid type file
+    """
+    with open(filename) as f:
+        line = f.readline()
+        while line:
+            if line.startswith('local'):
+                replace_underscore = '"' + line.split('"')[1] + '"'
+            if line.startswith('return'):
+                text = [line[line.find('{'):]]
+                text += f.readlines()
+            line = f.readline()
+    # print(f'local _ = {replace_underscore}')
+    for i, line in enumerate(text):
+        line = line.strip().replace('=', ':').replace("'", '"').replace("_", replace_underscore)
+        if len(line.split(':'))>1:
+            k, v = line.split(':')
+            line = '"' + k + '":' + v
+        text[i] = line
+    text = " ".join(text)
+    pattern = re.compile("[{][a-zA-Z\d,\"\s\-]+[}]")
+    res_match = re.finditer(pattern, text)
+    while re.search(pattern, text):
+        # print("while...")
+        for l in res_match:
+            text = text[:l.start()] + '[' + l.group(0)[1:-1] + ']' + text[l.end():]
+        pattern = re.compile("[{]{1}[a-zA-Z\d,\"\[\]\s\-]+[}]{1}")
+        res_match = re.finditer(pattern, text)
+        # print("Next while")
+    # print(text)
+    return json.loads(text)

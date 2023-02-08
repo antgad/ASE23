@@ -4,6 +4,7 @@ import OPTIONS
 from SYM import SYM
 import os
 from utils import *
+from grid_utils import *
 import json
 options=OPTIONS.OPTIONS()
 help="""
@@ -123,15 +124,22 @@ def test_copy():
     print("b4",o(t1),"\nafter",o(t2)) 
 
 def test_repCols():
-    t=repCols( dofile(options['file']).cols )
+    t=repCols(dofile(options['file'])['cols'])
     list(map(oo, t.cols.all)) 
     list(map(oo, t.rows)) 
+
+
+def test_synonyms():
+    show_grid(repCols(dofile(options['file'])['cols']).cluster())
+
+
 
 eg("the", "show settings", disp_setting)
 eg("copy","check copy",test_copy)
 eg("sym", "check syms", test_sym)
 eg("num", "check nums", test_num)
-# eg("repcols","checking repcols", test_repCols)
+eg("repcols","checking repcols", test_repCols)
+# eg("synonyms","checking repcols cluster", test_synonyms)
 # eg("data", "read DATA csv", test_data)
 # eg("clone","duplicate Structure", test_clone)
 # eg("around","sorting nearest neighbours",test_around)
