@@ -74,6 +74,9 @@ class DATA:
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
         return sorted(list(map(fun,rows)),key=lambda k: k['dist'])
     
+    def furthest(self,row1,rows,cols):
+        t=self.around(row1,rows,cols)
+        return t[len(t)]
     
     def half(self,rows=None,cols=None,above=None):
         def project(row):
