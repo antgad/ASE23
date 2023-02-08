@@ -5,8 +5,32 @@ import SYM
 import math
 import re
 import io
+from copy import deepcopy
 
 ## Show
+
+def repCols(cols):
+    #TODO
+    cols=copy(cols)
+    # for _,col in pairs(cols) do
+    #     col[#col] = col[1]..":"..col[#col]
+    #     for j=2,#col do col[j-1] = col[j] end
+    #     col[#col]=nil end 
+    # table.insert(cols,1,kap(cols[1], function(k,v) return "Num"..k end))
+    # cols[1][#cols[1]]="thingX"
+    # return DATA(cols)
+
+# function repCols(cols)
+#   cols=copy(cols)
+#   for _,col in pairs(cols) do
+#     col[#col] = col[1]..":"..col[#col]
+#     for j=2,#col do col[j-1] = col[j] end
+#     col[#col]=nil end 
+#   table.insert(cols,1,kap(cols[1], function(k,v) return "Num"..k end))
+#   cols[1][#cols[1]]="thingX"
+#   return DATA(cols)
+#   end
+
 def show(node, what, cols, nPlaces, lvl=0):
     if node:
         # io.write("| "*lvl + str(node.data.rows) + "  ")
@@ -80,6 +104,11 @@ def many(t,n):
         u.append(any(t)) 
     return u
 
+def copy(t):
+    """
+        Returns deep copy of t
+    """
+    return deepcopy(t)
 
 ## Strings
 
@@ -127,3 +156,7 @@ def csv(sFilename, fun):
         else:
             return f.close()
 
+def dofile(sFilename):
+    #TODO
+    data_dict = {}
+    return data_dict
