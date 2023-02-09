@@ -10,34 +10,6 @@ from copy import deepcopy
 import json
 
 ## Show
-def repPlace(data):
-    n,g=20,{}
-    for i in range(n):
-        g[i]={}
-        for j in range(n):
-            g[i][j]=' '
-    maxy=0
-    print()
-    for r,row in enumerate(data.rows):
-        c=chr(r+65)
-        print(c,row.cells[-1])
-        x,y = int(row.x*n),int(row.y*n)
-        maxy=max(maxy,y)
-        g[x][y]=c
-        print()
-        for y in range(maxy):
-            oo(g[y])
-    pass
-
-def repgrid(sFile):
-    t=dofile(sFile)
-    rows=repRows(t,transpose(t.cols))
-    cols=repCols(t['cols'])
-    show(rows.cluster())
-    show(cols.cluster())
-    repPlace(rows)
-
-
 
 def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
@@ -54,11 +26,11 @@ def show(node, what=None, cols=None, nPlaces=1, lvl=0):
 def show_grid(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
         # io.write("| "*lvl + str(node.data.rows) + "  ")
-        print("| "*lvl, end=" ")#+ str(len(node['data'].rows)), end= "  ")
-        if (not node.get('left')):
+        print("|.."*lvl, end=" ")#+ str(len(node['data'].rows)), end= "  ")
+        if (node.get('left')==None):
             print(o(node['data'].rows[-1].cells[-1]))
-        else: 
-            print("", rnd(100*node['c']))
+        else:
+            print(rnd(100*node['c'], 0))
         show_grid(node.get('left'), what,cols, nPlaces, lvl+1)
         show_grid(node.get('right'), what,cols,nPlaces, lvl+1)
 

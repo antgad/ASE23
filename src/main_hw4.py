@@ -132,6 +132,26 @@ def test_repCols():
 def test_synonyms():
     show_grid(repCols(dofile(options['file'])['cols']).cluster())
 
+def test_repRows():
+    t = dofile(options['file'])
+    rows = repRows(t, transpose(t['cols']))
+    list(map(oo, rows.cols.all))
+    list(map(oo, rows.rows))
+
+def test_prototypes():
+    t = dofile(options['file'])
+    rows = repRows(t, transpose(t['cols']))
+    show_grid(rows.cluster())
+
+def test_position():
+    t = dofile(options['file'])
+    rows = repRows(t, transpose(t['cols']))
+    rows.cluster()
+    repPlace(rows)
+
+def test_repgrid():
+    repgrid(options['file'])
+
 
 
 eg("the", "show settings", disp_setting)
@@ -139,7 +159,13 @@ eg("copy","check copy",test_copy)
 eg("sym", "check syms", test_sym)
 eg("num", "check nums", test_num)
 eg("repcols","checking repcols", test_repCols)
-# eg("synonyms","checking repcols cluster", test_synonyms)
+eg("synonyms","checking repcols cluster", test_synonyms)
+eg("reprows","checking reprows", test_repRows)
+eg("prototypes","checking reprows cluster", test_prototypes)
+eg("position","where's wally", test_position)
+eg("every","the whole enchilada", test_repgrid)
+
+
 # eg("data", "read DATA csv", test_data)
 # eg("clone","duplicate Structure", test_clone)
 # eg("around","sorting nearest neighbours",test_around)

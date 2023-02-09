@@ -16,7 +16,7 @@ class COLS:
         self.klass = None    
 
         for n, s in enumerate(t):
-            col =  NUM(n, s) if re.findall(r"^[A-Z]+",s) else SYM(n, s)
+            col =  NUM(n, s) if re.search("^[A-Z]+",s) else SYM(n, s)
             self.all.append(col)
 
             if not re.findall(r"X$", s):
