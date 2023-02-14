@@ -74,40 +74,50 @@ class DATA:
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
         return sorted(list(map(fun,rows)),key=lambda k: k['dist'])
     
+    def furthest(self,row1,rows,cols):
+        t=self.around(row1,rows,cols)
+        return t[-1]
     
+
     def half(self,rows=None,cols=None,above=None):
-        def project(row):
-            return {"row": row, "dist": utils.cosine(dist(row,A),dist(row,B),C)}
         
+        def project(row):
+            x,y = utils.cosine(dist(row,A), dist(row,B),c)
+            # row.__setattr__('x', x)
+            if 'x' not in vars(row).keys() or not row.x:
+                row.__setattr__('x', x)
+            if 'y' not in vars(row).keys() or not row.y:
+                row.__setattr__('y', y)
+            row.x = row.x if row.x else x
+            row.y = row.y if row.y else y
+            return {'row':row, 'x':x, 'y':y}
         def dist(row1,row2):
             return self.dist(row1,row2,cols)
         rows = rows if rows else self.rows
-        some = utils.many(rows,self.config['Sample'])
-        A = above or utils.any(some)
-        B = self.around(A,some)[int(self.config['Far'] * len(rows))]['row']
-        C = dist(A,B)
+        # some = utils.many(rows,self.config['Sample'])
+        A = above or utils.any(rows)
+        B = self.furthest(A, rows, None)['row']
+        c = dist(A,B)
         left,right=[],[]
         mid=None
-        for n,temp in enumerate(sorted(map(project,rows),key = lambda k:k['dist'])):
+        for n,temp in enumerate(sorted(map(project,rows),key = lambda k:k['x'])):
             if n<len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
             else:
                 right.append(temp['row'])
-        return left,right,A,B,mid,C
+        return left,right,A,B,mid,c
 
 
-    def cluster(self,rows=None,min=None,cols=None,above=None):
+    def cluster(self,rows=None,cols=None,above=None):
         rows= rows if rows else self.rows
-
-        min=min if min else len(rows)**self.config['min']
         cols=cols if cols else self.cols.x
         node={'data':self.clone(rows)}
-        if len(rows)>2*min:
-            
-            left,right,node['A'],node['B'],node['mid'], _=self.half(rows,cols,above)
-            node['left']= self.cluster(left,min,cols,node['A'])
-            node['right']= self.cluster(right,min,cols,node['B'])
+        
+        if len(rows)>=2:    
+            left,right,node['A'],node['B'],node['mid'], node['c'] = self.half(rows,cols,above)
+            node['left']= self.cluster(rows=left, cols=cols, above=node['A'])
+            node['right']= self.cluster(rows=right, cols=cols, above=node['B'])
         return node
     
 

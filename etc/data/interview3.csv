@@ -1,0 +1,22 @@
+local _ = " "
+return {
+ domain="Technology Companies",
+ cols={   {'Low Market Cap', 5, 5, 4, 5, 3, 3, 2, 1, 3, 1, 'High Market Cap'},
+               {'Low Revenue', 5, 5, 5, 5, 3, 2, 2, 3, 1, 1, 'High Revenue'},
+  {'Low Profit Margin', 5, 4, 3, 4, 1, 2, 2, 3, 4, 1, 'High Profit Margin'},
+       {'Conservative' , 3, 2, 3, 3, 4, 4, 2, 3, 1, 5, 'Innovative'},
+{'Poor Brand Recognition', 5, 4, 5, 5, 5, 3, 4, 3, 1, 2, 'High Brand Recognition'},
+      {'Less Diversity', 4, 5, 3, 5, 3, 2, 1, 5, 3, 1, 'More Diversity'},
+       {'Unsustainable', 5, 5, 4, 4, 2, 4, 3, 3, 2, 2, 'Highly Sustainable'},
+      {'Unhappy Employee', 4, 5, 2, 2, 3, 4, 4, 5, 5, 5, 'Happy Employees'}},
+rows={                      { _, _, _, _, _, _, _, _, _, 'Apple'},
+                            { _, _, _, _, _, _, _, _, 'Microsoft'},
+                            { _, _, _, _, _, _, _, 'Google'},
+                            { _, _, _, _, _, _, 'Amazon'},
+                            { _, _, _, _, _,  'Facebook'},
+                            { _, _, _, _,  'Tesla'},
+                            { _, _, _,  'Samsung'},
+                            { _, _,  'Intel'},
+                            { _, 'Oracle'},
+                            {'Huawei'}}
+}

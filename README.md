@@ -20,6 +20,7 @@ This repo contains the work of Group 29 for CSC 591 Automated Software Engineeri
 | [Homework 1](https://github.com/antgad/ASE23/blob/main/src/main_hw1.py) | :heavy_check_mark: |
 | [Homework 2](https://github.com/antgad/ASE23/blob/main/src/main_hw2.py) | :heavy_check_mark: |
 | [Homework 3](https://github.com/antgad/ASE23/blob/main/src/main_hw3.py)   | :heavy_check_mark: |
+| Homework 4   | :x: |
 
 
 
@@ -27,6 +28,6 @@ This repo contains the work of Group 29 for CSC 591 Automated Software Engineeri
 The team includes: 
 Anant Gadodia
 Krish Jain
-Manasvi  Ghosalkar
+Manasi  Ghosalkar
 
 The course is taught br Dr. Timothy James Menziez.
