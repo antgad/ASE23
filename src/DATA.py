@@ -57,7 +57,7 @@ class DATA:
             s1 -= math.exp(col.w * (x-y)/len(ys))
             s2 -= math.exp(col.w * (y-x)/len(ys))
         return s1/len(ys)<s2/len(ys)
-    
+
 
     def dist(self, row1,row2,cols=None):
         n,d=0,0
@@ -74,9 +74,9 @@ class DATA:
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
         return sorted(list(map(fun,rows)),key=lambda k: k['dist'])
     
-    def furthest(self,row1,rows,cols):
-        t=self.around(row1,rows,cols)
-        return t[-1]
+    # def furthest(self,row1,rows,cols):
+    #     t=self.around(row1,rows,cols)
+    #     return t[-1]
     
 
     def half(self,rows=None,cols=None,above=None):
@@ -90,17 +90,18 @@ class DATA:
                 row.__setattr__('y', y)
             row.x = row.x if row.x else x
             row.y = row.y if row.y else y
-            return {'row':row, 'x':x, 'y':y}
+            return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c)}
         def dist(row1,row2):
             return self.dist(row1,row2,cols)
         rows = rows if rows else self.rows
         # some = utils.many(rows,self.config['Sample'])
-        A = above or utils.any(rows)
-        B = self.furthest(A, rows, None)['row']
+        some = utils.many(rows,self.config['Halves'])
+        A = above or utils.any(some)
+        B    = self.around(A,some)[int(self.config['Far'] * len(rows))//1]['row']
         c = dist(A,B)
         left,right=[],[]
         mid=None
-        for n,temp in enumerate(sorted(map(project,rows),key = lambda k:k['x'])):
+        for n,temp in enumerate(sorted(map(project,rows),key = lambda k:k['dist'])):
             if n<len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
@@ -109,19 +110,35 @@ class DATA:
         return left,right,A,B,mid,c
 
 
-    def cluster(self,rows=None,cols=None,above=None):
+    def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
         cols=cols if cols else self.cols.x
+        min = min or len(rows)**self.config['min']
         node={'data':self.clone(rows)}
         
-        if len(rows)>=2:    
+        if len(rows)>=2*min:    
             left,right,node['A'],node['B'],node['mid'], node['c'] = self.half(rows,cols,above)
-            node['left']= self.cluster(rows=left, cols=cols, above=node['A'])
-            node['right']= self.cluster(rows=right, cols=cols, above=node['B'])
+            node['left']= self.cluster(rows=left, min=min, cols=cols, above=node['A'])
+            node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
         return node
     
 
     def sway(self,rows=None, min=None, cols=None, above=None):
+        data = self
+        def worker(rows, worse, above=None):
+            if len(rows) <= len(data.rows)**self.config['min']:
+                return rows, utils.many(worse, self.config['rest']*len(rows))
+            else:
+                l,r,A,B,C,D = self.half(rows=rows, cols=None, above=above)
+                if self.better(B,A):
+                    l,r,A,B = r,l,B,A
+                for row in r:
+                    worse.append(row)
+                return worker(l,worse,A)
+        best, rest = worker(data.rows,[])
+        return self.clone(best), self.clone(rest)
+    
+    def tree(self, rows=None , min=None, cols=None, above=None):
         rows = rows if rows else self.rows
         min = min if min else len(rows)**self.config['min']
         cols = cols if cols else self.cols.x
@@ -132,4 +149,3 @@ class DATA:
                 left,right,node['A'],node['B'] = right,left,node['B'],node['A']
             node['left']=self.sway(left,min,cols,node["A"])
         return node
-            
