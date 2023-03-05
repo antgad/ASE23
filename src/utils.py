@@ -13,18 +13,20 @@ import json
 
 config= {}
 ## Show
+def __init__(self, src):
+    with open('config.json') as json_file:
+            self.config = json.load(json_file)
 
 def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
         # io.write("| "*lvl + str(node.data.rows) + "  ")
-        print("| "*lvl + str(len(node['data'].rows)), end= "  ")
+        # print("| "*lvl + str(len(node['data'].rows)), end= "  ")
         if (not node.get('left')) or (lvl==0):
-            print(o(node['data'].stats(node['data'].cols.y,nPlaces, what="mid")))
+            print(o(node['data'].stats(node['data'].cols.y,nPlaces, what=what)))
         else: 
             print("")
         show(node.get('left'), what,cols, nPlaces, lvl+1)
         show(node.get('right'), what,cols,nPlaces, lvl+1)
-
 
 def show_grid(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
@@ -38,7 +40,6 @@ def show_grid(node, what=None, cols=None, nPlaces=1, lvl=0):
         show_grid(node.get('right'), what,cols,nPlaces, lvl+1)
 
 
-# print(not node.left and  o(last(last(node.data.rows).cells))  or fmt("%.f",rnd(100*node.c)))
 ## Numerics
 Seed=937162211
 
@@ -160,7 +161,7 @@ def csv(sFilename, fun):
         else:
             return f.close()
 
-def dofile(filename = 'repgrid1.csv'):
+def dofile(filename = 'auto.csv'):
     """
         Function to read data from repgrid type file
     """
@@ -210,8 +211,9 @@ def cliffsDelta(ns1,ns2):
                 gt += 1
             if x < y:
                 lt += 1
+    return abs(lt - gt)/n
     return abs(lt - gt)/n > config['cliffs']
-    # return abs(lt - gt)/n > options['cliffs']
+
 
 def showTree(node, what, cols, nPlaces, lvl = 0):
   if node:
@@ -220,7 +222,7 @@ def showTree(node, what, cols, nPlaces, lvl = 0):
         print(o(node['data'].stats(node['data'].cols.y,nPlaces, what="mid")))
     else: 
         print("")
-    show(node.get('left'), what,cols, nPlaces, lvl+1)
+    show(node.get('left'), what,cols,nPlaces, lvl+1)
     show(node.get('right'), what,cols,nPlaces, lvl+1)
 
 def bins(cols,rowss):
@@ -240,11 +242,10 @@ def bins(cols,rowss):
         out.append(r)
     return out
 
-def bin(col,x):
-    if (x=="?") or (isinstance(col, SYM)):
+def bin(col, x):
+    if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(config['bins']-1)
-    # tmp = (col.hi - col.lo)/(options['bins']-1)
+    tmp = (col.hi - col.lo)/(16-1)
     if col.hi == col.lo:
         return 1
     else:
@@ -262,8 +263,8 @@ def merge(col1,col2):
     new.hi = max(col1.hi,col2.hi) 
   return new
 
-def RANGE(at,txt,lo,hi):
-    return {'at':at, 'txt':txt, 'lo':lo, 'hi':lo or hi or lo, 'y':SYM()}
+def RANGE(at,txt,lo,hi=None):
+    return {'at':at, 'txt':txt, 'lo':lo, 'hi':lo or hi or lo, 'y':SYM.SYM()}
 
 def extend(range,n,s):
     range['lo'] = min(range['lo'], n)

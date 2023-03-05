@@ -15,6 +15,7 @@ OPTIONS:
   -b  --bins    initial number of bins       = 16
   -c  --cliffs  cliff's delta threshold      = .147
   -F  --Far     distance to distant          = .95
+  -f  --file    name of file           = ../etc/data/auto93.csv
   -g  --go      start-up action              = nothing
   -h  --help    show help                    = false
   -H  --Halves  search space for clustering  = 512
@@ -24,6 +25,7 @@ OPTIONS:
   -r  --rest    how many of rest to sample   = 4
   -R  --Reuse   child splits reuse a parent pole = true
   -s  --seed    random number seed           = 937162211
+
 ACTIONS:
 """
 
@@ -96,32 +98,41 @@ def test_num():
     num1, num2 = NUM.NUM(), NUM.NUM()
     global Seed
     Seed = options['seed']
-    for i in range(1,10**3+1):
+    for i in range(10000):
         num1.add(rand(0,1))
     Seed = options['seed']
-    for i in range(1,10**3+1):
+    for i in range(10000):
         num2.add(rand(0,1)**2)
+
     m1 = rnd(num1.mid(),1)
     m2 = rnd(num2.mid(),1)
     d1 = rnd(num1.div(),1)
     d2 = rnd(num2.div(),1)
     print(1, m1, d1)
-    print(2, m2, d2) 
-    return (m1 > m2) and (0.5 == rnd(m1,1))
+    print(2, m2, d2)
+
+    return num1.mid()>num2.mid() and (0.6 == rnd(num1.mid(),1))
 
 def helper_csv(t):
     global var
     var = var + len(t)
 
 def test_csv():
-    csv(options['file'], helper_csv)
-    return (var == 3192)
+    n = 0
+
+    def f(t):
+        nonlocal n
+        n += len(t)
+
+    csv(options['file'], f)
+    return n == 8 * 399
 
 def test_data():
     data = DATA(options['file'])
     col=data.cols.x[1]
     print(col.lo, col.hi, col.mid(), col.div())
     print(o(data.stats(data.cols.y, 2, what="mid")))
+
 
 def test_clone():
     data1 = DATA(options['file'])
@@ -130,22 +141,27 @@ def test_clone():
     print(data2.stats(data2.cols.y, 2, what="mid"))
 
 def test_cliffs():
-    assert(False == cliffsDelta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]))
-    assert(True  == cliffsDelta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6])) 
+    r1 = cliffsDelta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]) > options['cliffs']
+    r2 = cliffsDelta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6]) > options['cliffs']
+    assert(False == r1)
+    assert(True  == r2) 
     t1,t2=[],[]
     for i in range(1,1001):
         t1.append(rand(0,1))
     for i in range(1,1001):
         t2.append(rand(0,1)**.5)
-    assert(False == cliffsDelta(t1,t1)) 
-    assert(True  == cliffsDelta(t1,t2)) 
+    r1 = cliffsDelta(t1,t1) > options['cliffs']
+    r2 = cliffsDelta(t1,t2) > options['cliffs']
+    assert(False == r1) 
+    assert(True  == r2) 
     diff =False
     j = 1.0
     while (not diff):
         def function(x):
             return x*j
         t3=list(map(function, t1))
-        diff=cliffsDelta(t1,t3)
+        rx = cliffsDelta(t1,t3) > options['cliffs']
+        diff= rx
         print(">",rnd(j),diff) 
         j*=1.025
 
@@ -159,30 +175,32 @@ def test_dist():
 def test_half():
     data = DATA(options['file'])
     left,right,A,B,mid,c = data.half() 
+
     print(len(left),len(right))
     l,r = data.clone(left), data.clone(right)
     print(A.cells, c)
     print(mid.cells) 
     print(B.cells)
-    print("l", l.stats('mid', l.cols.y, 2))
-    print("r", r.stats('mid', r.cols.y, 2))
+    print("l", l.stats(l.cols.y, 2, what='mid'))
+    print("r", r.stats(r.cols.y, 2, what="mid"))
 
 def test_tree():
     data = DATA(options['file'])
-    showTree(data.tree(), "mid" ,data.cols.y,1)
+    showTree(data.tree(),cols=data.cols.y, nPlaces=1, what="mid")
+
 
 def test_sway():
     data = DATA(options['file'])
     best,rest = data.sway()
-    print("\nall ", data.stats('mid', data.cols.y, 2))
-    print("", data.stats('div', data.cols.y, 2))
-    print("\nbest",best.stats('mid', best.cols.y, 2))
-    print("", best.stats('div', best.cols.y, 2))
-    print("\nrest", rest.stats('mid', rest.cols.y, 2))
-    print("", rest.stats('div', rest.cols.y, 2))
+    print("\nall ", data.stats(data.cols.y, 2, what="mid"))
+    print("", data.stats(data.cols.y, 2, what="div"))
+    print("\nbest",best.stats(best.cols.y, 2, what="mid"))
+    print("", best.stats(best.cols.y, 2, what="div"))
+    print("\nrest", rest.stats(rest.cols.y, 2, what="mid"))
+    print("", rest.stats(rest.cols.y, 2, what="div"))
 
 def test_bins():
-    global b4
+    b4 = None
     data = DATA(options['file'])
     best,rest = data.sway()
     print("all","","","",{'best':len(best.rows), 'rest':len(rest.rows)})
