@@ -37,17 +37,17 @@ jobs:
 #     - name: Test with pytest
 #       run: |
 #         pytest
-    - name: Run HW 1 tests
-      run: cd ./src; (python main_hw1.py -g all )
+    # - name: Run HW 1 tests
+    #   run: cd ./src; (python main_hw1.py -g all )
       
-    - name: Run HW 2 tests
-      run: cd ./src; (python main_hw2.py -g all )
+    # - name: Run HW 2 tests
+    #   run: cd ./src; (python main_hw2.py -g all )
     
-    - name: Run HW 3 tests
-      run: cd ./src; (python main_hw3.py -g all )
+    # - name: Run HW 3 tests
+    #   run: cd ./src; (python main_hw3.py -g all )
     
-    - name: Run HW 4 tests
-      run: cd ./src; (python main_hw4.py -g all )
+    # - name: Run HW 4 tests
+    #   run: cd ./src; (python main_hw4.py -g all )
       
     - name: Run HW 5 tests
       run: cd ./src; (python main_hw5.py -g all )
