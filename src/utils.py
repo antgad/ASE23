@@ -8,20 +8,25 @@ import re
 import io
 from copy import deepcopy
 import json
+# import OPTIONS
+# options=OPTIONS.OPTIONS()
 
+config= {}
 ## Show
+def __init__(self, src):
+    with open('config.json') as json_file:
+            self.config = json.load(json_file)
 
 def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
         # io.write("| "*lvl + str(node.data.rows) + "  ")
-        print("| "*lvl + str(len(node['data'].rows)), end= "  ")
+        # print("| "*lvl + str(len(node['data'].rows)), end= "  ")
         if (not node.get('left')) or (lvl==0):
-            print(o(node['data'].stats(node['data'].cols.y,nPlaces, what="mid")))
+            print(o(node['data'].stats(node['data'].cols.y,nPlaces, what=what)))
         else: 
             print("")
         show(node.get('left'), what,cols, nPlaces, lvl+1)
         show(node.get('right'), what,cols,nPlaces, lvl+1)
-
 
 def show_grid(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
@@ -35,15 +40,16 @@ def show_grid(node, what=None, cols=None, nPlaces=1, lvl=0):
         show_grid(node.get('right'), what,cols,nPlaces, lvl+1)
 
 
-# print(not node.left and  o(last(last(node.data.rows).cells))  or fmt("%.f",rnd(100*node.c)))
 ## Numerics
 Seed=937162211
 
 def rint(lo,hi):
-    return math.floor(0.5+ rand(lo,hi))
+    # return math.floor(0.5+ rand(lo,hi))
+    x= rand(lo, hi)
+    return math.floor(0.5 + x)
 
-def rand(lo=0,hi=1):
-    global Seed
+def rand(lo=0,hi=1, Seed=937162211):
+    # global Seed
     Seed = (16807 * Seed) % 2147483647
     return lo + (hi-lo) * Seed / 2147483647  
 
@@ -155,7 +161,7 @@ def csv(sFilename, fun):
         else:
             return f.close()
 
-def dofile(filename = 'repgrid1.csv'):
+def dofile(filename = 'auto.csv'):
     """
         Function to read data from repgrid type file
     """
@@ -187,3 +193,127 @@ def dofile(filename = 'repgrid1.csv'):
         # print("Next while")
     # print(text)
     return json.loads(text)
+
+def cliffsDelta(ns1,ns2):
+    if len(ns1)>256:
+        ns1 = many(ns1,256)
+    if len(ns2)>256:
+        ns2 = many(ns2,256)
+    if len(ns1)>10*len(ns2):
+        ns1 = many(ns1,10*len(ns2))
+    if len(ns2)>10*len(ns1):
+        ns2 = many(ns2,10*len(ns1))
+    n,gt,lt = 0,0,0
+    for x in ns1:
+        for y in ns2:
+            n = n + 1
+            if x>y:
+                gt += 1
+            if x < y:
+                lt += 1
+    return abs(lt - gt)/n
+    return abs(lt - gt)/n > config['cliffs']
+
+
+def showTree(node, what, cols, nPlaces, lvl = 0):
+  if node:
+    print("|.. "*lvl + "[" + str(len(node['data'].rows)) + "]", end= "  ")
+    if (not node.get('left')) or (lvl==0):
+        print(o(node['data'].stats(node['data'].cols.y,nPlaces, what="mid")))
+    else: 
+        print("")
+    show(node.get('left'), what,cols,nPlaces, lvl+1)
+    show(node.get('right'), what,cols,nPlaces, lvl+1)
+
+def bins(cols,rowss):
+    out = []
+    for col in cols:
+        ranges = {}
+        for y,rows in rowss.items():
+            for row in rows:
+                x = row.cells[col.at]
+                if (x != "?"):
+                    k = int(bin(col,x))
+                    if not k in ranges:
+                        ranges[k] = RANGE(col.at,col.txt,x)
+                    extend(ranges[k], x, y)
+        ranges = list(dict(sorted(ranges.items())).values())
+        r = ranges if isinstance(col, SYM.SYM) else mergeAny(ranges)
+        out.append(r)
+    return out
+
+def bin(col, x):
+    if (x=="?") or (isinstance(col, SYM.SYM)):
+        return x
+    tmp = (col.hi - col.lo)/(16-1)
+    if col.hi == col.lo:
+        return 1
+    else:
+        return math.floor(x/tmp + .5)*tmp
+
+def merge(col1,col2):
+  new = copy(col1)
+  if isinstance(col1, SYM.SYM):
+      for n in col2.has:
+        new.add(n)
+  else:
+    for n in col2.has:
+        new.add(new,n)
+    new.lo = min(col1.lo,col2.lo)
+    new.hi = max(col1.hi,col2.hi) 
+  return new
+
+def RANGE(at,txt,lo,hi=None):
+    return {'at':at, 'txt':txt, 'lo':lo, 'hi':lo or hi or lo, 'y':SYM.SYM()}
+
+def extend(range,n,s):
+    range['lo'] = min(range['lo'], n)
+    range['hi'] = max(range['hi'], n )
+    range['y'].add(s)
+
+def itself(x):
+    return x
+
+def value(has,nB = None, nR = None, sGoal = None):
+    sGoal = sGoal or True
+    nB = nB or 1
+    nR = nR or 1
+    b,r = 0,0
+    for x,n in has.items():
+        if x == sGoal:
+            b += n
+        else:
+            r += n
+    b, r = b/(nB+1/float("inf")), r/(nR+1/float("inf"))
+    return b**2/(b+r)
+
+def merge2(col1,col2):
+  new = merge(col1,col2)
+  if new.div() <= (col1.div()*col1.n + col2.div()*col2.n)/new.n:
+    return new
+  
+def mergeAny(ranges0):
+    def noGaps(t):
+        for j in range(1, len(t)):
+            t[j]['lo'] = t[j-1]['hi']
+        t[0]['lo'] = float("-inf")
+        t[len(t)-1]['hi'] = float("inf")
+        return t
+    ranges1 = []
+    j = 0
+    while j <= (len(ranges0)-1):
+        left=ranges0[j]
+        if j ==len(ranges0) - 1:
+            right = None
+        else:
+            right = ranges0[j+1]
+        if right:
+            y = merge2(left['y'],right['y'])
+            if y:
+                j += 1
+                left['hi'], left['y'] = right['hi'], y
+        ranges1.append(left)
+        j = j+1
+    if len(ranges0)==len(ranges1):
+        return noGaps(ranges0)
+    return mergeAny(ranges1)
