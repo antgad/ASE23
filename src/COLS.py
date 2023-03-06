@@ -24,7 +24,7 @@ class COLS:
                     self.klass = col
                 if re.findall(r"[!+-]$", s):
                     self.y.append(col)
-                else:
+                else:   
                     self.x.append(col)
 
     def add(self, row):

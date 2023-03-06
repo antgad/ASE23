@@ -11,8 +11,9 @@ class NUM:
         self.at = at
         self.txt = txt
         self.n, self.mu, self.m2 = 0, 0, 0
-        self.lo, self.hi = inf, -inf
+        self.lo, self.hi = float(inf), -float(inf)
         self.w = -1 if self.txt.endswith('-') else 1
+        self.has = {}
     
     def add(self, n): # add `n`, update lo,hi and stuff needed for standard deviation
         if n != '?':
