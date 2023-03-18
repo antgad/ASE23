@@ -40,6 +40,7 @@ class DATA:
         _ = list(map(lambda x: data.add(x), init if init!=None else []))
         return data
     
+    # TODO: modify
     def stats(self, cols, nPlaces, what): 
         def fun(_, col ):
             if what=='div':
@@ -120,7 +121,7 @@ class DATA:
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
         return node
     
-
+    # TODO: modify
     def sway(self,rows=None, min=None, cols=None, above=None):
         data = self
         def worker(rows, worse, above=None):

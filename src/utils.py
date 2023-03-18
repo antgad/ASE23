@@ -317,3 +317,15 @@ def mergeAny(ranges0):
     if len(ranges0)==len(ranges1):
         return noGaps(ranges0)
     return mergeAny(ranges1)
+
+def showRule(rule):
+    #TODO
+    pass
+
+def selects(rule, rows):
+    pass
+
+def xpln(data,best,rest):
+    #TODO
+    def v(has): return value(has, len(best.rows), len(rest.rows), "best")
+    pass
