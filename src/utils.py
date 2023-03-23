@@ -69,16 +69,9 @@ def cosine(a,b,c):
 
 ## Lists
 
-# def map(t, fun): 
-#     u={}
-#     for k, v in enumerate(t):
-#         v, k = fun(v)
-#         if v!=None:
-#             if k:
-#                 u[k] = v
-#             else:
-#                 u[1 + len(u)] = v
-#     return u
+def map(fun,src):
+    for i in src:
+        fun(i)
 
 def kap(t, fun):
     u={}
@@ -318,10 +311,47 @@ def mergeAny(ranges0):
     return mergeAny(ranges1)
 
 def showRule(rule):
-    #TODO
+    def pretty(rangeR):
+        return rangeR['lo'] if rangeR['lo']==rangeR['hi'] else [rangeR['lo'],rangeR['hi']]
+    def merge(t0):
+        right, left ={}, {}
+        j = 1
+        t = []
+        while j<= len(t0):
+            left = t0[j-1]
+            right = None if j==len(t0) else t0[j]
+            if right and right['hi'] == left['lo']:
+                left['hi'] = right['hi']
+                j += 1
+            t.append({'lo': left['lo'], 'hi': left['hi']})
+            J += 1
+        return t if len(t0) == len(t) else merge(t)
+    def merges(attr, ranges):
+        return list(map(pretty,merge(sorted(ranges, key =  lambda k: k['lo'])))), attr
+    return kap(rule, merges)
+
+
     pass
 
 def selects(rule, rows):
+    def disjunction(ranges, row):
+        for range in ranges:
+            lo,hi,at = range['lo'], range['hi'], range['ar']
+            x = row.cells['at']
+            if (x == '?') or (lo == hi == x) or (lo <= x and x < hi):
+                return True
+        return False
+
+    def conjunction(row):
+        for ranges in rule.values():
+            if not disjunction(ranges, row):
+                return False
+        return True
+    def fun(r):
+        if conjunction(r):
+            return r
+    return(list(map(fun,rows)))
+
     pass
 
 def per(t,p=0.5):
@@ -335,4 +365,28 @@ def diffs(nums1,nums2):
         return cliffsDelta(nums.has,nums2[k].has), nums.txt
     return kap(nums1,fun)
 
+def firstN(sortedRanges,scoreFun):
+    def printRange(r):
+        print(r['range'].txt, r['range'].lo, r['range'].hi, rnd(r['val']), dict(r['range'].y.has))
+    print()
+    map( printRange, sortedRanges)
+    first = sortedRanges[0]['val']
+    print()
+    def useful(range):
+        if range['val'] > 0.05 and range['val'] > first/10:
+            return range
+    
+    sortedRanges = list(map(useful, sortedRanges))
+    most, out = -1, -1
+    sortedRanges = [i for i  in sortedRanges if i != None]
+    for n in range(1, len(sortedRanges)+1):
+        temp, rule = scoreFun(i['range'] for i in sortedRanges[:n])
+        if temp and temp>most:
+            out, most = rule, temp
+    return out, most
 
+
+
+
+
+    
