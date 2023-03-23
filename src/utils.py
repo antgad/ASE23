@@ -50,7 +50,7 @@ def rint(lo,hi):
     x, Seed= rand(lo, hi)
     return math.floor(0.5 + x)
 
-def rand(lo=0,hi=1):
+def rand(lo=0,hi=1, Seed=937162211):
     # global Seed
     Seed = (16807 * Seed) % 2147483647
     return lo + (hi-lo) * Seed / 2147483647  
