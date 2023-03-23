@@ -182,5 +182,24 @@ class DATA:
             rule = self.Rule(ranges,max_size)
             if rule:
                 print(utils.showRule(rule))
+                bestr = utils.selects(rule, best.rows)
+                restr = utils.selects(rule, rest.rows)
+                if len(bestr) + len(restr) >0:
+                    return v({'best':len(bestr), 'rest': len(restr)}) , rule
+        for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows},self.config):
+            max_size[ranges[1].txt] = len(ranges)
+            print()
+            for r in ranges:
+                print(r.txt, r.lo, r.hi)
+                val = v(r.y.has)
+                temp.append({'range': r, 'max': len(ranges), 'val': val})
+        rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)
+        return rule, most
+    def betters(self,n):
+        sorted_rows = list(sorted(self.rows, key=functools.cmp_to_key(self.better)))
+        return n and sorted_rows[:n], sorted_rows[n+1:] or sorted_rows
+
+
+
 
     
