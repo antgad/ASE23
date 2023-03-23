@@ -47,7 +47,7 @@ Seed=937162211
 
 def rint(lo,hi):
     # return math.floor(0.5+ rand(lo,hi))
-    x, Seed= rand(lo, hi)
+    x= rand(lo, hi)
     return math.floor(0.5 + x)
 
 def rand(lo=0,hi=1, Seed=937162211):
