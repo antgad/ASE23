@@ -2,7 +2,7 @@ from ROW import ROW
 from COLS import COLS
 import utils
 import math
-
+import functools
 import json
 import random
 

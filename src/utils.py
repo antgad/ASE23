@@ -8,6 +8,7 @@ import re
 import io
 from copy import deepcopy
 import json
+import random
 # import OPTIONS
 # options=OPTIONS.OPTIONS()
 
@@ -21,8 +22,7 @@ def __init__(self, src):
 
 def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
-        # io.write("| "*lvl + str(node.data.rows) + "  ")
-        # print("| "*lvl + str(len(node['data'].rows)), end= "  ")
+        print("|" * lvl + str(len(node['data'.rows])) + " ", end='')
         if (not node.get('left')) or (lvl==0):
             print(o(node['data'].stats(node['data'].cols.y,nPlaces, what=what)))
         else: 
@@ -47,15 +47,15 @@ Seed=937162211
 
 def rint(lo,hi):
     # return math.floor(0.5+ rand(lo,hi))
-    x= rand(lo, hi)
+    x, Seed= rand(lo, hi)
     return math.floor(0.5 + x)
 
 def rand(lo=0,hi=1, Seed=937162211):
     # global Seed
     Seed = (16807 * Seed) % 2147483647
-    return lo + (hi-lo) * Seed / 2147483647  
+    return lo + (hi-lo) * Seed / 2147483647, Seed  
 
-def rnd(n,nPlaces=3):
+def rnd(n,nPlaces=2):
     mult = pow(10,nPlaces)
     return math.floor(n*mult+0.5)/mult
 
@@ -90,7 +90,7 @@ def kap(t, fun):
             if k:
                 u[k] = v
             else:
-                u[1 + len(u)] = v
+                u[len(u)] = v
     return u
 
 def lt(x):
@@ -99,13 +99,14 @@ def lt(x):
 def keys(t):
     return sorted(kap(t, lambda k, _: k))
 
-def any(t): return t[rint(0,len(t)-1)]
+def any(t,Seed=937162211): 
+    random.seed(Seed)
+    return random.choices(t)[0]
 
-def many(t,n): 
+def many(t,n,Seed=937162211): 
     u=[]
-    for _ in range(n):
-        u.append(any(t)) 
-    return u
+    random.seed(Seed)
+    return random.choices(t,k=n)
 
 def copy(t):
     """
@@ -196,15 +197,15 @@ def dofile(filename = 'auto.csv'):
     # print(text)
     return json.loads(text)
 
-def cliffsDelta(ns1,ns2):
+def cliffsDelta(ns1,ns2,Seed=937162211):
     if len(ns1)>256:
-        ns1 = many(ns1,256)
+        ns1 = many(ns1,256, Seed)
     if len(ns2)>256:
-        ns2 = many(ns2,256)
+        ns2 = many(ns2,256,Seed)
     if len(ns1)>10*len(ns2):
-        ns1 = many(ns1,10*len(ns2))
+        ns1 = many(ns1,10*len(ns2),Seed)
     if len(ns2)>10*len(ns1):
-        ns2 = many(ns2,10*len(ns1))
+        ns2 = many(ns2,10*len(ns1),Seed)
     n,gt,lt = 0,0,0
     for x in ns1:
         for y in ns2:
@@ -213,7 +214,6 @@ def cliffsDelta(ns1,ns2):
                 gt += 1
             if x < y:
                 lt += 1
-    return abs(lt - gt)/n
     return abs(lt - gt)/n > config['cliffs']
 
 
@@ -276,10 +276,7 @@ def extend(range,n,s):
 def itself(x):
     return x
 
-def value(has,nB = None, nR = None, sGoal = None):
-    sGoal = sGoal or True
-    nB = nB or 1
-    nR = nR or 1
+def value(has,nB = 1, nR = 1, sGoal = True):
     b,r = 0,0
     for x,n in has.items():
         if x == sGoal:
@@ -326,5 +323,16 @@ def showRule(rule):
 
 def selects(rule, rows):
     pass
+
+def per(t,p=0.5):
+    p=math.floor(p*len(t))+0.5
+    return t[max(1,min(len(t),p))]
+
+
+
+def diffs(nums1,nums2):
+    def fun(k,nums):
+        return cliffsDelta(nums.has,nums2[k].has), nums.txt
+    return kap(nums1,fun)
 
 
