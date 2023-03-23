@@ -12,9 +12,9 @@ import random
 # import OPTIONS
 # options=OPTIONS.OPTIONS()
 
-config= {}
+'''config= {}
 with open('config.json') as json_file:
-    config = json.load(json_file)
+    config = json.load(json_file)'''
 ## Show
 def __init__(self, src):
     with open('config.json') as json_file:
@@ -190,7 +190,7 @@ def dofile(filename = 'auto.csv'):
     # print(text)
     return json.loads(text)
 
-def cliffsDelta(ns1,ns2,Seed=937162211):
+def cliffsDelta(self,ns1,ns2,Seed=937162211):
     if len(ns1)>256:
         ns1 = many(ns1,256, Seed)
     if len(ns2)>256:
@@ -207,7 +207,7 @@ def cliffsDelta(ns1,ns2,Seed=937162211):
                 gt += 1
             if x < y:
                 lt += 1
-    return abs(lt - gt)/n > config['cliffs']
+    return abs(lt - gt)/n > self.config['cliffs']
 
 
 def showTree(node, what, cols, nPlaces, lvl = 0):
@@ -237,10 +237,10 @@ def bins(cols,rowss):
         out.append(r)
     return out
 
-def bin(col, x):
+def bin(self,col, x):
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(config['bins']-1)
+    tmp = (col.hi - col.lo)/(self.config['bins']-1)
     if col.hi == col.lo:
         return 1
     else:
