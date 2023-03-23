@@ -32,7 +32,7 @@ ACTIONS:
 """
 
 def main(funs,saved={},fails=0):
-
+    print("temp")
     options.cli_setting(help)
     for k,v in options.items():
         saved[k]=v
