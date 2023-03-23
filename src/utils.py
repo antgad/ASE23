@@ -12,6 +12,8 @@ import json
 # options=OPTIONS.OPTIONS()
 
 config= {}
+with open('config.json') as json_file:
+    config = json.load(json_file)
 ## Show
 def __init__(self, src):
     with open('config.json') as json_file:
@@ -237,7 +239,7 @@ def bins(cols,rowss):
                     if not k in ranges:
                         ranges[k] = RANGE(col.at,col.txt,x)
                     extend(ranges[k], x, y)
-        ranges = list(dict(sorted(ranges.items())).values())
+        ranges = list(dict(sorted(ranges.items(), key = lambda k:k[1].lo)).values())
         r = ranges if isinstance(col, SYM.SYM) else mergeAny(ranges)
         out.append(r)
     return out
@@ -245,14 +247,14 @@ def bins(cols,rowss):
 def bin(col, x):
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(16-1)
+    tmp = (col.hi - col.lo)/(config['bins']-1)
     if col.hi == col.lo:
         return 1
     else:
         return math.floor(x/tmp + .5)*tmp
 
 def merge(col1,col2):
-  new = copy(col1)
+  new = deepcopy(col1)
   if isinstance(col1, SYM.SYM):
       for n in col2.has:
         new.add(n)
@@ -325,7 +327,4 @@ def showRule(rule):
 def selects(rule, rows):
     pass
 
-def xpln(data,best,rest):
-    #TODO
-    def v(has): return value(has, len(best.rows), len(rest.rows), "best")
-    pass
+
