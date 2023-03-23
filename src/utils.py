@@ -8,10 +8,13 @@ import re
 import io
 from copy import deepcopy
 import json
+import random
 # import OPTIONS
 # options=OPTIONS.OPTIONS()
 
 config= {}
+with open('config.json') as json_file:
+    config = json.load(json_file)
 ## Show
 def __init__(self, src):
     with open('config.json') as json_file:
@@ -19,8 +22,7 @@ def __init__(self, src):
 
 def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
-        # io.write("| "*lvl + str(node.data.rows) + "  ")
-        # print("| "*lvl + str(len(node['data'].rows)), end= "  ")
+        print("|" * lvl + str(len(node['data'.rows])) + " ", end='')
         if (not node.get('left')) or (lvl==0):
             print(o(node['data'].stats(node['data'].cols.y,nPlaces, what=what)))
         else: 
@@ -45,15 +47,15 @@ Seed=937162211
 
 def rint(lo,hi):
     # return math.floor(0.5+ rand(lo,hi))
-    x= rand(lo, hi)
+    x, Seed= rand(lo, hi)
     return math.floor(0.5 + x)
 
 def rand(lo=0,hi=1, Seed=937162211):
     # global Seed
     Seed = (16807 * Seed) % 2147483647
-    return lo + (hi-lo) * Seed / 2147483647  
+    return lo + (hi-lo) * Seed / 2147483647, Seed  
 
-def rnd(n,nPlaces=3):
+def rnd(n,nPlaces=2):
     mult = pow(10,nPlaces)
     return math.floor(n*mult+0.5)/mult
 
@@ -67,16 +69,9 @@ def cosine(a,b,c):
 
 ## Lists
 
-# def map(t, fun): 
-#     u={}
-#     for k, v in enumerate(t):
-#         v, k = fun(v)
-#         if v!=None:
-#             if k:
-#                 u[k] = v
-#             else:
-#                 u[1 + len(u)] = v
-#     return u
+def map(fun,src):
+    for i in src:
+        fun(i)
 
 def kap(t, fun):
     u={}
@@ -88,7 +83,7 @@ def kap(t, fun):
             if k:
                 u[k] = v
             else:
-                u[1 + len(u)] = v
+                u[len(u)] = v
     return u
 
 def lt(x):
@@ -97,13 +92,14 @@ def lt(x):
 def keys(t):
     return sorted(kap(t, lambda k, _: k))
 
-def any(t): return t[rint(0,len(t)-1)]
+def any(t,Seed=937162211): 
+    random.seed(Seed)
+    return random.choices(t)[0]
 
-def many(t,n): 
+def many(t,n,Seed=937162211): 
     u=[]
-    for _ in range(n):
-        u.append(any(t)) 
-    return u
+    random.seed(Seed)
+    return random.choices(t,k=n)
 
 def copy(t):
     """
@@ -194,15 +190,15 @@ def dofile(filename = 'auto.csv'):
     # print(text)
     return json.loads(text)
 
-def cliffsDelta(ns1,ns2):
+def cliffsDelta(ns1,ns2,Seed=937162211):
     if len(ns1)>256:
-        ns1 = many(ns1,256)
+        ns1 = many(ns1,256, Seed)
     if len(ns2)>256:
-        ns2 = many(ns2,256)
+        ns2 = many(ns2,256,Seed)
     if len(ns1)>10*len(ns2):
-        ns1 = many(ns1,10*len(ns2))
+        ns1 = many(ns1,10*len(ns2),Seed)
     if len(ns2)>10*len(ns1):
-        ns2 = many(ns2,10*len(ns1))
+        ns2 = many(ns2,10*len(ns1),Seed)
     n,gt,lt = 0,0,0
     for x in ns1:
         for y in ns2:
@@ -211,7 +207,6 @@ def cliffsDelta(ns1,ns2):
                 gt += 1
             if x < y:
                 lt += 1
-    return abs(lt - gt)/n
     return abs(lt - gt)/n > config['cliffs']
 
 
@@ -237,7 +232,7 @@ def bins(cols,rowss):
                     if not k in ranges:
                         ranges[k] = RANGE(col.at,col.txt,x)
                     extend(ranges[k], x, y)
-        ranges = list(dict(sorted(ranges.items())).values())
+        ranges = list(dict(sorted(ranges.items(), key = lambda k:k[1].lo)).values())
         r = ranges if isinstance(col, SYM.SYM) else mergeAny(ranges)
         out.append(r)
     return out
@@ -245,14 +240,14 @@ def bins(cols,rowss):
 def bin(col, x):
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(16-1)
+    tmp = (col.hi - col.lo)/(config['bins']-1)
     if col.hi == col.lo:
         return 1
     else:
         return math.floor(x/tmp + .5)*tmp
 
 def merge(col1,col2):
-  new = copy(col1)
+  new = deepcopy(col1)
   if isinstance(col1, SYM.SYM):
       for n in col2.has:
         new.add(n)
@@ -274,10 +269,7 @@ def extend(range,n,s):
 def itself(x):
     return x
 
-def value(has,nB = None, nR = None, sGoal = None):
-    sGoal = sGoal or True
-    nB = nB or 1
-    nR = nR or 1
+def value(has,nB = 1, nR = 1, sGoal = True):
     b,r = 0,0
     for x,n in has.items():
         if x == sGoal:
@@ -319,13 +311,82 @@ def mergeAny(ranges0):
     return mergeAny(ranges1)
 
 def showRule(rule):
-    #TODO
+    def pretty(rangeR):
+        return rangeR['lo'] if rangeR['lo']==rangeR['hi'] else [rangeR['lo'],rangeR['hi']]
+    def merge(t0):
+        right, left ={}, {}
+        j = 1
+        t = []
+        while j<= len(t0):
+            left = t0[j-1]
+            right = None if j==len(t0) else t0[j]
+            if right and right['hi'] == left['lo']:
+                left['hi'] = right['hi']
+                j += 1
+            t.append({'lo': left['lo'], 'hi': left['hi']})
+            J += 1
+        return t if len(t0) == len(t) else merge(t)
+    def merges(attr, ranges):
+        return list(map(pretty,merge(sorted(ranges, key =  lambda k: k['lo'])))), attr
+    return kap(rule, merges)
+
+
     pass
 
 def selects(rule, rows):
+    def disjunction(ranges, row):
+        for range in ranges:
+            lo,hi,at = range['lo'], range['hi'], range['ar']
+            x = row.cells['at']
+            if (x == '?') or (lo == hi == x) or (lo <= x and x < hi):
+                return True
+        return False
+
+    def conjunction(row):
+        for ranges in rule.values():
+            if not disjunction(ranges, row):
+                return False
+        return True
+    def fun(r):
+        if conjunction(r):
+            return r
+    return(list(map(fun,rows)))
+
     pass
 
-def xpln(data,best,rest):
-    #TODO
-    def v(has): return value(has, len(best.rows), len(rest.rows), "best")
-    pass
+def per(t,p=0.5):
+    p=math.floor(p*len(t))+0.5
+    return t[max(1,min(len(t),p))]
+
+
+
+def diffs(nums1,nums2):
+    def fun(k,nums):
+        return cliffsDelta(nums.has,nums2[k].has), nums.txt
+    return kap(nums1,fun)
+
+def firstN(sortedRanges,scoreFun):
+    def printRange(r):
+        print(r['range'].txt, r['range'].lo, r['range'].hi, rnd(r['val']), dict(r['range'].y.has))
+    print()
+    map( printRange, sortedRanges)
+    first = sortedRanges[0]['val']
+    print()
+    def useful(range):
+        if range['val'] > 0.05 and range['val'] > first/10:
+            return range
+    
+    sortedRanges = list(map(useful, sortedRanges))
+    most, out = -1, -1
+    sortedRanges = [i for i  in sortedRanges if i != None]
+    for n in range(1, len(sortedRanges)+1):
+        temp, rule = scoreFun(i['range'] for i in sortedRanges[:n])
+        if temp and temp>most:
+            out, most = rule, temp
+    return out, most
+
+
+
+
+
+    

@@ -2,7 +2,8 @@
 # Summarizes a stream of numbers.
 
 from math import inf,pow
-from utils import rnd
+from utils import rnd, rand, rint
+import json
 
 
 class NUM:
@@ -14,15 +15,38 @@ class NUM:
         self.lo, self.hi = float(inf), -float(inf)
         self.w = -1 if self.txt.endswith('-') else 1
         self.has = {}
+        self.ok = True
+        self.config={}
+        with open('config.json') as json_file:
+            self.config = json.load(json_file)
+
     
-    def add(self, n): # add `n`, update lo,hi and stuff needed for standard deviation
-        if n != '?':
+    def add(self, x,n=1): # add `n`, update lo,hi and stuff needed for standard deviation
+        if x != '?':
             self.n  = self.n + 1
-            d = n - self.mu
-            self.mu = self.mu + d/self.n
-            self.m2 = self.m2 + d*(n - self.mu)
+            d = x - self.mu
+            self.mu += d/self.n
+            self.m2 += d*(n - self.mu)
             self.lo = min(n, self.lo)
             self.hi = max(n, self.hi) 
+            all = len(self.has)
+            t,_ = rand()
+            if self.config["Max"] > all:
+                pos = all+1
+            elif t<self.config['Max']/self.n:
+                pos = rint(1,all)
+            else: 
+                pos = 0
+            if pos:
+                self.has[pos] = x
+                self.ok = False
+
+    def has_f(self):
+        temp = list(dict(sorted(self.has.items(),key=lambda k: k[1])).values())
+        self.ok = True
+        return temp
+
+            
     
     def mid(self): # return the mean
         return self.mu
