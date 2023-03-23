@@ -39,6 +39,7 @@ def main(funs,saved={},fails=0):
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
     print('json dumped')
+    print(rand(0,1))
     if options['help']:
         print(help)
     
