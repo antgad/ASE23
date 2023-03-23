@@ -38,6 +38,7 @@ def main(funs,saved={},fails=0):
         saved[k]=v
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
+    print('json dumped')
     if options['help']:
         print(help)
     
