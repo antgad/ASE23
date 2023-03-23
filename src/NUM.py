@@ -30,7 +30,7 @@ class NUM:
             self.lo = min(n, self.lo)
             self.hi = max(n, self.hi) 
             all = len(self.has)
-            t,_ = rand()
+            t= rand()
             if self.config["Max"] > all:
                 pos = all+1
             elif t<self.config['Max']/self.n:
