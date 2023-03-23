@@ -24,9 +24,9 @@ class NUM:
     def add(self, x,n=1): # add `n`, update lo,hi and stuff needed for standard deviation
         if x != '?':
             self.n  = self.n + 1
-            d = x - self.mu
+            '''d = x - self.mu
             self.mu += d/self.n
-            self.m2 += d*(n - self.mu)
+            self.m2 += d*(n - self.mu)'''
             self.lo = min(n, self.lo)
             self.hi = max(n, self.hi) 
             all = len(self.has)
