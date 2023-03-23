@@ -42,13 +42,10 @@ class DATA:
     
     # TODO: modify
     def stats(self, cols, nPlaces, what): 
+        cols = cols if cols else self.cols.y
         def fun(_, col ):
-            if what=='div':
-                value= col.div()
-            else:
-                value=col.mid()
-            return col.rnd(value,nPlaces), col.txt
-        return utils.kap(cols or self.cols.y,fun)
+            return col.rnd(getattr(cols,what)(),nPlaces), col.txt
+        return utils.kap(cols,fun)
     
 
     def better(self,row1,row2):
@@ -73,7 +70,7 @@ class DATA:
         cols =  cols if cols else self.cols.x
         def function(row2):
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
-        return sorted(list(map(function,rows or self.rows)),key=lambda k: k['dist'])
+        return sorted(list(map(function,rows)),key=lambda k: k['dist'])
 
 
     def half(self,rows=None,cols=None,above=None):
@@ -81,9 +78,12 @@ class DATA:
             return self.dist(row1,row2,cols)
         
         rows = rows if rows else self.rows
-        some = utils.many(rows,self.config['Halves'])
+        some = utils.many(rows,self.config['Halves'],self.config['seed'])
 
-        A = above or utils.any(some)
+        if self.config['Reuse']:
+            A=above
+        if not above or not self.config['Reuse']:
+            A=utils.any(some, self.config['seed'])
         B = self.around(A,some)[int(self.config['Far'] * len(rows))//1]['row']
         c = dist(A,B)
         left,right=[],[]
@@ -100,16 +100,21 @@ class DATA:
             return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c)}
         
         mid=None
+        evals = 0
         for n,temp in enumerate(sorted(list(map(project,rows)),key = lambda k:k['dist'])):
-            if n<len(rows)//2:
+            if n<=len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
             else:
                 right.append(temp['row'])
-        return left,right,A,B,mid,c
+        if self.config['Reuse'] and above:
+            evals = 1
+        else: 
+            evals = 2
+        return left,right,A,B,mid,c, evals
 
 
-    def cluster(self,rows=None,min=None,cols=None,above=None):
+    '''def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
         cols=cols if cols else self.cols.x
         min = min or len(rows)**self.config['min']
@@ -119,23 +124,23 @@ class DATA:
             left,right,node['A'],node['B'],node['mid'], _ = self.half(rows,cols,above)
             node['left']= self.cluster(rows=left, min=min, cols=cols, above=node['A'])
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
-        return node
+        return node'''
     
-    # TODO: modify
+    
     def sway(self,rows=None, min=None, cols=None, above=None):
         data = self
-        def worker(rows, worse, above=None):
+        def worker(rows, worse, evals0, above=None):
             if len(rows) <= len(data.rows)**self.config['min']:
-                return rows, utils.many(worse, self.config['rest']*len(rows))
+                return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
-                l,r,A,B,C,D = self.half(rows=rows, cols=None, above=above)
+                l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above)
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:
                     worse.append(row)
-                return worker(l,worse,A)
-        best, rest = worker(data.rows,[])
-        return self.clone(best), self.clone(rest)
+                return worker(l,worse,evals+evals0,A)
+        best, rest, evals = worker(data.rows,[],0)
+        return self.clone(best), self.clone(rest), evals
     
     def tree(self, rows=None , min=None, cols=None, above=None):
         rows = rows if rows else self.rows
@@ -144,8 +149,38 @@ class DATA:
         node = {'data':self.clone(rows)}
         if len(rows)>2*min:
 
-            left, right, node['A'], node['B'], node['mid'], _ =self.half(rows, cols, above)
+            left, right, node['A'], node['B'], node['mid'], _,_ =self.half(rows, cols, above)
             node['left'] = self.tree(left, min, cols, node['A'])
             node['right'] = self.tree(right, min, cols, node['B'])
         return node
+    
+
+    def prune(self,rule,max_size):
+        n=0
+        for txt,r in rule.items():
+            n+=1
+            if len(r) == max_size[txt]:
+                n+=1
+                rule[txt] = None
+        if n>0:
+            return rule
+        
+    def Rule(self,ranges, max_size):
+        t={}
+        for r in ranges:
+            if r.txt not in t:
+                t[r.txt]=[]
+            t[r.txt].append({'lo':r.lo,'hi':r.hi,'at':r.at})
+        return self.prune(t,max_size)
+        
+    def xpln(self,best,rest):
+        temp = []
+        max_size = {}
+        def v(has):
+            return utils.value(has,len(best.rows),len(rest.rows),'best')
+        def score(ranges):
+            rule = self.Rule(ranges,max_size)
+            if rule:
+                print(utils.showRule(rule))
+
     
