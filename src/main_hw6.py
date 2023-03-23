@@ -8,9 +8,10 @@ from grid_utils import *
 import json
 options=OPTIONS.OPTIONS()
 help="""
-data.py : an example csv reader script
+xpln: multi-goal semi-supervised explanation
 (c)2023
-USAGE:   data.py  [OPTIONS] [-g ACTION]
+USAGE: lua xpln.lua [OPTIONS] [-g ACTIONS]
+  
 OPTIONS:
   -b  --bins    initial number of bins       = 16
   -c  --cliffs  cliff's delta threshold      = .147
