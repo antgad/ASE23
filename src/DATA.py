@@ -44,7 +44,7 @@ class DATA:
     def stats(self, cols, nPlaces, what): 
         cols = cols if cols else self.cols.y
         def fun(_, col ):
-            print(col)
+            #print(col)
             return col.rnd(getattr(col,what)(),nPlaces), col.txt
         return utils.kap(cols,fun)
     
