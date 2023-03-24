@@ -162,6 +162,7 @@ def test_cliffs():
     while (not diff):
         def function(x):
             return x*j
+        print(t1)
         t3=list(map(function, t1))
         rx = cliffsDelta(t1,t3) > options['cliffs']
         diff= rx
