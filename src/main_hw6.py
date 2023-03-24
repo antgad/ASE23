@@ -39,7 +39,6 @@ def main(funs,saved={},fails=0):
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
     print('json dumped')
-    print(rand(0,1))
     if options['help']:
         print(help)
     
@@ -77,7 +76,7 @@ def test_sym():
         sym.add(x)
 
     print(sym.mid(), rnd(sym.div()))
-    return rnd(sym.div()) == 1.379
+    return rnd(sym.div()) == 1.38
 
 def test_rand():
     Seed = 1
@@ -92,17 +91,21 @@ def test_some():
     num1 = NUM.NUM()
     for i in range(1,10001):
         num1.add(i)
-    print(num1.has)
+    #print(num1.has)
 
 def test_num():
     num1, num2 = NUM.NUM(), NUM.NUM()
-    global Seed
+    #global Seed
     Seed = options['seed']
     for i in range(10000):
-        num1.add(rand(0,1))
+        a,Seed=rand(0,1,Seed)
+        num1.add(a)
+    print(num1.mid())
     Seed = options['seed']
     for i in range(10000):
-        num2.add(rand(0,1)**2)
+        a,Seed=rand(0,1,Seed)
+        num2.add(a**2)
+    print(num2.mid())
 
     m1 = rnd(num1.mid(),1)
     m2 = rnd(num2.mid(),1)
@@ -111,7 +114,7 @@ def test_num():
     print(1, m1, d1)
     print(2, m2, d2)
 
-    return num1.mid()>num2.mid() and (0.6 == rnd(num1.mid(),1))
+    return num1.mid()>num2.mid() and (0.5 == rnd(num1.mid(),1))
 
 def helper_csv(t):
     global var

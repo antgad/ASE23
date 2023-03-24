@@ -12,9 +12,9 @@ import random
 # import OPTIONS
 # options=OPTIONS.OPTIONS()
 
-'''config= {}
+config= {}
 with open('config.json') as json_file:
-    config = json.load(json_file)'''
+    config = json.load(json_file)
 ## Show
 def __init__(self, src):
     with open('config.json') as json_file:
@@ -47,13 +47,14 @@ Seed=937162211
 
 def rint(lo,hi):
     # return math.floor(0.5+ rand(lo,hi))
-    x= rand(lo, hi)
+    x,_= rand(lo, hi)
     return math.floor(0.5 + x)
 
-def rand(lo=0,hi=1, Seed=937162211):
-    # global Seed
+def rand(lo=0,hi=1, Seed= 937162211):
+    #global Seed
+   
     Seed = (16807 * Seed) % 2147483647
-    return lo + (hi-lo) * Seed / 2147483647  
+    return lo + (hi-lo) * Seed / 2147483647,Seed
 
 def rnd(n,nPlaces=2):
     mult = pow(10,nPlaces)
