@@ -71,7 +71,6 @@ def cosine(a,b,c):
 
 def map(fun,src):
     for i in src:
-        print(i)
         fun(i)
 
 def kap(t, fun):
