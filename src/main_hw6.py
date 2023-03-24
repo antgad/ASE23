@@ -150,9 +150,9 @@ def test_cliffs():
     assert(True  == r2) 
     t1,t2=[],[]
     for i in range(1,1001):
-        t1.append(rand(0,1))
+        t1.append(rand(0,1)[0])
     for i in range(1,1001):
-        t2.append(rand(0,1)**.5)
+        t2.append(rand(0,1)[0]**.5)
     r1 = cliffsDelta(t1,t1) > options['cliffs']
     r2 = cliffsDelta(t1,t2) > options['cliffs']
     assert(False == r1) 
