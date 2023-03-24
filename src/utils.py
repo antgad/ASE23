@@ -190,7 +190,7 @@ def dofile(filename = 'auto.csv'):
     # print(text)
     return json.loads(text)
 
-def cliffsDelta(self,ns1,ns2,Seed=937162211):
+def cliffsDelta(ns1,ns2,Seed=937162211):
     if len(ns1)>256:
         ns1 = many(ns1,256, Seed)
     if len(ns2)>256:
@@ -209,7 +209,7 @@ def cliffsDelta(self,ns1,ns2,Seed=937162211):
                 gt += 1
             if x < y:
                 lt += 1
-    return abs(lt - gt)/n > self.config['cliffs']
+    return abs(lt - gt)/n > config['cliffs']
 
 
 def showTree(node, what, cols, nPlaces, lvl = 0):
