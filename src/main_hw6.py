@@ -4,6 +4,7 @@ import OPTIONS
 from SYM import SYM
 import os
 from utils import *
+import utils
 from grid_utils import *
 import json
 options=OPTIONS.OPTIONS()
@@ -162,7 +163,7 @@ def test_cliffs():
     while (not diff):
         def function(x):
             return x*1.0
-        t3=list(map(function, t1))
+        t3=list(utils.map(function, t1))
         rx = cliffsDelta(t1,t3) > options['cliffs']
         diff= rx
         print(">",rnd(j),diff) 
