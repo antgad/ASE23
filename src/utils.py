@@ -13,8 +13,7 @@ import random
 # options=OPTIONS.OPTIONS()
 
 config= {}
-with open('config.json') as json_file:
-    config = json.load(json_file)
+
 ## Show
 def __init__(self, src):
     with open('config.json') as json_file:
@@ -201,6 +200,8 @@ def cliffsDelta(self,ns1,ns2,Seed=937162211):
     if len(ns2)>10*len(ns1):
         ns2 = many(ns2,10*len(ns1),Seed)
     n,gt,lt = 0,0,0
+    with open('config.json') as json_file:
+        config = json.load(json_file)
     for x in ns1:
         for y in ns2:
             n = n + 1
@@ -239,6 +240,8 @@ def bins(cols,rowss):
     return out
 
 def bin(self,col, x):
+    with open('config.json') as json_file:
+        config = json.load(json_file)
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
     tmp = (col.hi - col.lo)/(self.config['bins']-1)
