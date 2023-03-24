@@ -70,7 +70,8 @@ def cosine(a,b,c):
 ## Lists
 
 def map(fun,src):
-    print(src)
+    if not src:
+        print(src)
     for i in src:
         fun(i)
 
