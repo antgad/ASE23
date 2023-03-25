@@ -244,12 +244,21 @@ def test_num():
         num.add(x)
     print(num.n, num.mu, num.div())
 
+def test_gauss():
+    t = []
+    n = NUM()
+    for i in range(10**4):
+        t.append(gaussian(10,2))
+        n.add(t[-1])
+    print(n.n, n.mu, n.sd)
 
 eg("ok","set randomseed", test_ok)
 
 eg('sample', 'demo random number generation', test_sample)
 
 eg('nums', 'demo of NUM', test_num)
+
+eg('gauss', 'test gauss', test_gauss)
 
 # eg('rand', 'demo random number generation', test_rand)
 
