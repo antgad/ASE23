@@ -28,13 +28,13 @@ ACTIONS:
 """
 
 def main(funs,saved={},fails=0):
-    print("temp")
     options.cli_setting(help)
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
-    print('json dumped')
+    # print('json dumped')
+    load_configs()
     if options['help']:
         print(help)
     
@@ -247,6 +247,19 @@ def test_gauss():
         n.add(t[-1])
     print(n.n, n.mu, n.sd)
 
+def test_basic():
+    print("\t\ttruee", 
+            bootstrap( {8, 7, 6, 2, 5, 8, 7, 3}, {8, 7, 6, 2, 5, 8, 7, 3}),
+            cliffsDelta( {8, 7, 6, 2, 5, 8, 7, 3}, {8, 7, 6, 2, 5, 8, 7, 3}))
+    print("\t\tfalse", 
+            bootstrap(  {8, 7, 6, 2, 5, 8, 7, 3},  {9, 9, 7, 8, 10, 9, 6}),
+            cliffsDelta( {8, 7, 6, 2, 5, 8, 7, 3}, {9, 9, 7, 8, 10, 9, 6})) 
+    print("\t\tfalse", 
+            bootstrap({0.34, 0.49, 0.51, 0.6,   .34,  .49,  .51, .6}, 
+                    {0.6,  0.7,  0.8,  0.9,   .6,   .7,   .8,  .9}),
+            cliffsDelta({0.34, 0.49, 0.51, 0.6,   .34,  .49,  .51, .6}, 
+                        {0.6,  0.7,  0.8,  0.9,   .6,   .7,   .8,  .9}))
+
 def test_bootmu():
     a,b=[],[]
     for i in range(100):
@@ -262,16 +275,46 @@ def test_bootmu():
         bs=bootstrap(a,b)
         print("",mu,1,cl,bs,cl and bs) 
 
+def test_pre():
+    print("\neg3")
+    d=1.00
+    for i in range(10):
+        t1,t2=[], []
+        for j in range(32):
+            t1.append(gaussian(10,1))
+            t2.append(gaussian(d*10,1))
+        print("\t", round(d, 2), d<1.1, bootstrap(t1,t2), bootstrap(t1,t1))
+        d=d+0.05
+
+def test_five():
+    for rx in tiles(scottKnot([
+            RX([0.34,0.49,0.51,0.6,.34,.49,.51,.6],"rx1"),
+            RX([0.6,0.7,0.8,0.9,.6,.7,.8,.9],"rx2"),
+            RX([0.15,0.25,0.4,0.35,0.15,0.25,0.4,0.35],"rx3"),
+            RX([0.6,0.7,0.8,0.9,0.6,0.7,0.8,0.9],"rx4"),
+            RX([0.1,0.2,0.3,0.4,0.1,0.2,0.3,0.4],"rx5")])):
+        print(rx.name,rx.rank,rx.show)
+
+def test_six():
+    for rx in tiles(scottKnot([
+            RX([101,100,99,101,99.5,101,100,99,101,99.5],"rx1"),
+            RX([101,100,99,101,100,101,100,99,101,100],"rx2"),
+            RX([101,100,99.5,101,99,101,100,99.5,101,99],"rx3"),
+            RX([101,100,99,101,100,101,100,99,101,100],"rx4")])):
+        print(rx.name,rx.rank,rx.show)
+
+
+
 
 eg("ok","set randomseed", test_ok)
-
 eg('sample', 'demo random number generation', test_sample)
-
 eg('nums', 'demo of NUM', test_num)
-
 eg('gauss', 'test gauss', test_gauss)
-
+eg('basic', 'test bootstrap and cliffsDelta', test_basic)
 eg('bootmu', 'test bootstrap', test_bootmu)
+eg('pre', 'test bootstrap eg3', test_pre)
+eg('five', 'test tiles and scottKnot', test_five)
+eg('six', 'test tiles and scottKnot', test_six)
 
 # eg('rand', 'demo random number generation', test_rand)
 

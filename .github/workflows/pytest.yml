@@ -49,5 +49,5 @@ jobs:
     # - name: Run HW 4 tests
     #   run: cd ./src; (python main_hw4.py -g all )
       
-    - name: Run HW 6 tests
-      run: cd ./src; (python main_hw6.py -g all )
+    - name: Run HW 7 tests
+      run: cd ./src; (python main_hw7.py -g all )
