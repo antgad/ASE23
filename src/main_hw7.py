@@ -1,12 +1,10 @@
 import random
 from NUM import NUM
 import OPTIONS
-# from SYM import SYM
 import os
-# import utils
 from stats import *
-# from grid_utils import *
 import json
+
 options=OPTIONS.OPTIONS()
 help="""
 xpln: multi-goal semi-supervised explanation
