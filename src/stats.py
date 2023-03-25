@@ -1,18 +1,16 @@
 import json
 import random
 import math
-
+from RX import RX
 from NUM import NUM
-# def NUM(t=[]):
-#     i= {'n':0,'mu':0,'m2':0,'sd':0}
-#     for _,x in enumerate(t): 
-#         add(i,x) 
-#     return i end
+
+
 config = {}
 def load_configs():
     global config
     with open('config.json') as json_file:
         config = json.load(json_file)
+
 
 def erf(x):
     # -- from Abramowitz and Stegun 7.1.26 
@@ -34,8 +32,10 @@ def erf(x):
     y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*math.exp(-x*x)
     return sign*y
 
+
 def gaussian(mu=0,sd=1):
     return mu + sd * math.sqrt(-2*math.log(random.random())) * math.cos(2*math.pi*random.random())
+
 
 def samples(t, n=None):
     u = []
@@ -43,6 +43,7 @@ def samples(t, n=None):
     for i in range(n):
         u.append(t[random.randint(0, n-1)])
     return u
+
 
 def cliffsDelta(ns1,ns2) -> bool: #; true if different by a trivial amount
     n,gt,lt = 0,0,0
@@ -53,13 +54,13 @@ def cliffsDelta(ns1,ns2) -> bool: #; true if different by a trivial amount
             n = n + 1
             if x > y: gt += 1
             if x < y: lt += 1
-    # with open('config.json') as json_file:
-    #     config = json.load(json_file)
     return abs(lt - gt)/n <= config['cliff']
+
 
 def delta(i:NUM, other:NUM):
     e, y, z= 1e-32, i, other
     return abs(y.mu - z.mu) / ((e + y.sd**2/y.n + z.sd**2/z.n)**.5)
+
 
 def bootstrap(y0, z0):
     # local n, x,y,z,xmu,ymu,zmu,yhat,zhat,tobs
@@ -92,36 +93,6 @@ def bootstrap(y0, z0):
     # -- On Tuesdays and Thursdays I lie awake at night convinced this should be "<"
     # -- and the above "> obs" should be "abs(delta - tobs) > someCriticalValue". 
     return n / config['bootstrap'] >= config['conf']
-
-# def RX(t,s=""):
-#     t.sort()
-#     return {'name': s, 'rank':0, "n":len(t), "show":"", "has":t}
-
-class RX:
-    def __init__(self, t=[], s=""):
-        t.sort()
-        self.name = s
-        self.rank = 0
-        self.n = len(t)
-        self.show = ""
-        self.has = t
-
-    def mid(self, t=None):
-        t = t or self.has
-        n = len(t)//2
-        return len(t)%2==0 and (t[n] +t[n+1])/2 or t[n+1]
-    
-    def div(self, t=None):
-        t = t or self.has
-        return (t[ len(t)*9//10 ] - t[ len(t)*1//10 ])/2.56
-
-    def merge(self, rx2):
-        rx1 = self
-        rx3 = RX([], rx1.name)
-        rx3.has = rx1.has + rx2.has
-        rx3.has.sort()
-        rx3.n = len(rx3.has)
-        return rx3
 
 
 def scottKnot(rxs):
