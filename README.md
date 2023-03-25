@@ -23,7 +23,7 @@ This repo contains the work of Group 29 for CSC 591 Automated Software Engineeri
 | [Homework 4](https://github.com/antgad/ASE23/blob/main/src/main_hw4.py)   | :heavy_check_mark: |
 | [Homework 5](https://github.com/antgad/ASE23/blob/main/src/main_hw5.py)   | :heavy_check_mark: |
 | [Homework 6](https://github.com/antgad/ASE23/tree/HW6)   | :x: |
-| [Homework 7](https://github.com/antgad/ASE23/tree/HW7)   | :x: |
+| [Homework 7](https://github.com/antgad/ASE23/blob/HW7/src/main_hw7.py)   | :heavy_check_mark: |
 
 
 
