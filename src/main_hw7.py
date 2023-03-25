@@ -3,7 +3,7 @@ from NUM import NUM
 import OPTIONS
 # from SYM import SYM
 import os
-# from utils import *
+# import utils
 from stats import *
 # from grid_utils import *
 import json
@@ -14,21 +14,16 @@ xpln: multi-goal semi-supervised explanation
 USAGE: lua xpln.lua [OPTIONS] [-g ACTIONS]
   
 OPTIONS:
-  -b  --bins    initial number of bins       = 16
-  -c  --cliffs  cliff's delta threshold      = .147
-  -d  --d       different is over sd*d       = .35
-  -f  --file    data file                    = ../etc/data/auto93.csv
-  -F  --Far     distance to distant          = .95
+  -b  --bootstrap    bootstrap               = 512
+  -c  --cliff   cliff's delta threshold      = .4
+  -C  --conf    conf                         = 0.05
+  -D  --cohen   cohen                        = 0.35
+  -F  --Fmt     Fmt                          = %6.2f
+  -w  --width   width                        = 40
   -g  --go      start-up action              = nothing
   -h  --help    show help                    = false
-  -H  --Halves  search space for clustering  = 512
-  -m  --min     size of smallest cluster     = .5
   -M  --Max     numbers                      = 512
-  -p  --p       dist coefficient             = 2
-  -r  --rest    how many of rest to sample   = 10
-  -R  --Reuse   child splits reuse a parent pole = true
-  -s  --seed    random number seed           = 937162211
-
+  
 ACTIONS:
 """
 
@@ -252,6 +247,22 @@ def test_gauss():
         n.add(t[-1])
     print(n.n, n.mu, n.sd)
 
+def test_bootmu():
+    a,b=[],[]
+    for i in range(100):
+        a.append(gaussian(10,1))
+    print("","mu","sd","cliffs","boot","both")
+    print("","--","--","------","----","----")
+    for mu in range(100,111):
+        mu = round(mu*0.1, 1)
+        b=[]
+        for i in range(100):
+            b.append(gaussian(mu,1))
+        cl=cliffsDelta(a,b)
+        bs=bootstrap(a,b)
+        print("",mu,1,cl,bs,cl and bs) 
+
+
 eg("ok","set randomseed", test_ok)
 
 eg('sample', 'demo random number generation', test_sample)
@@ -259,6 +270,8 @@ eg('sample', 'demo random number generation', test_sample)
 eg('nums', 'demo of NUM', test_num)
 
 eg('gauss', 'test gauss', test_gauss)
+
+eg('bootmu', 'test bootstrap', test_bootmu)
 
 # eg('rand', 'demo random number generation', test_rand)
 
