@@ -13,8 +13,7 @@ import random
 # options=OPTIONS.OPTIONS()
 
 config= {}
-with open('config.json') as json_file:
-    config = json.load(json_file)
+
 ## Show
 def __init__(self, src):
     with open('config.json') as json_file:
@@ -47,13 +46,14 @@ Seed=937162211
 
 def rint(lo,hi):
     # return math.floor(0.5+ rand(lo,hi))
-    x, Seed= rand(lo, hi)
+    x,_= rand(lo, hi)
     return math.floor(0.5 + x)
 
-def rand(lo=0,hi=1, Seed=937162211):
-    # global Seed
+def rand(lo=0,hi=1, Seed= 937162211):
+    #global Seed
+   
     Seed = (16807 * Seed) % 2147483647
-    return lo + (hi-lo) * Seed / 2147483647, Seed  
+    return lo + (hi-lo) * Seed / 2147483647,Seed
 
 def rnd(n,nPlaces=2):
     mult = pow(10,nPlaces)
@@ -69,9 +69,9 @@ def cosine(a,b,c):
 
 ## Lists
 
-def map(fun,src):
-    for i in src:
-        fun(i)
+# def map(fun,src): # Skip this and use the python inbuilt map function
+#     for i in src:
+#         fun(i)
 
 def kap(t, fun):
     u={}
@@ -200,6 +200,8 @@ def cliffsDelta(ns1,ns2,Seed=937162211):
     if len(ns2)>10*len(ns1):
         ns2 = many(ns2,10*len(ns1),Seed)
     n,gt,lt = 0,0,0
+    with open('config.json') as json_file:
+        config = json.load(json_file)
     for x in ns1:
         for y in ns2:
             n = n + 1
@@ -237,10 +239,12 @@ def bins(cols,rowss):
         out.append(r)
     return out
 
-def bin(col, x):
+def bin(self,col, x):
+    with open('config.json') as json_file:
+        config = json.load(json_file)
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(config['bins']-1)
+    tmp = (col.hi - col.lo)/(self.config['bins']-1)
     if col.hi == col.lo:
         return 1
     else:

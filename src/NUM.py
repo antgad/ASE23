@@ -27,10 +27,10 @@ class NUM:
             d = x - self.mu
             self.mu += d/self.n
             self.m2 += d*(n - self.mu)
-            self.lo = min(n, self.lo)
-            self.hi = max(n, self.hi) 
+            self.lo = min(x, self.lo)
+            self.hi = max(x, self.hi) 
             all = len(self.has)
-            t,_ = rand()
+            t= rand()[0]
             if self.config["Max"] > all:
                 pos = all+1
             elif t<self.config['Max']/self.n:

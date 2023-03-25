@@ -4,13 +4,15 @@ import OPTIONS
 from SYM import SYM
 import os
 from utils import *
+import utils
 from grid_utils import *
 import json
 options=OPTIONS.OPTIONS()
 help="""
-data.py : an example csv reader script
+xpln: multi-goal semi-supervised explanation
 (c)2023
-USAGE:   data.py  [OPTIONS] [-g ACTION]
+USAGE: lua xpln.lua [OPTIONS] [-g ACTIONS]
+  
 OPTIONS:
   -b  --bins    initial number of bins       = 16
   -c  --cliffs  cliff's delta threshold      = .147
@@ -31,12 +33,13 @@ ACTIONS:
 """
 
 def main(funs,saved={},fails=0):
-
+    print("temp")
     options.cli_setting(help)
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
+    print('json dumped')
     if options['help']:
         print(help)
     
@@ -74,7 +77,7 @@ def test_sym():
         sym.add(x)
 
     print(sym.mid(), rnd(sym.div()))
-    return rnd(sym.div()) == 1.379
+    return rnd(sym.div()) == 1.38
 
 def test_rand():
     Seed = 1
@@ -89,17 +92,21 @@ def test_some():
     num1 = NUM.NUM()
     for i in range(1,10001):
         num1.add(i)
-    print(num1.has)
+    # oo(num1.has)
 
 def test_num():
     num1, num2 = NUM.NUM(), NUM.NUM()
-    global Seed
+    #global Seed
     Seed = options['seed']
     for i in range(10000):
-        num1.add(rand(0,1))
+        a,Seed=rand(0,1,Seed)
+        num1.add(a)
+    print(num1.mid())
     Seed = options['seed']
     for i in range(10000):
-        num2.add(rand(0,1)**2)
+        a,Seed=rand(0,1,Seed)
+        num2.add(a**2)
+    print(num2.mid())
 
     m1 = rnd(num1.mid(),1)
     m2 = rnd(num2.mid(),1)
@@ -108,7 +115,7 @@ def test_num():
     print(1, m1, d1)
     print(2, m2, d2)
 
-    return num1.mid()>num2.mid() and (0.6 == rnd(num1.mid(),1))
+    return num1.mid()>num2.mid() and (0.5 == rnd(num1.mid(),1))
 
 def helper_csv(t):
     global var
@@ -144,9 +151,9 @@ def test_cliffs():
     assert(True  == r2) 
     t1,t2=[],[]
     for i in range(1,1001):
-        t1.append(rand(0,1))
+        t1.append(rand(0,1)[0])
     for i in range(1,1001):
-        t2.append(rand(0,1)**.5)
+        t2.append(rand(0,1)[0]**.5)
     r1 = cliffsDelta(t1,t1) > options['cliffs']
     r2 = cliffsDelta(t1,t2) > options['cliffs']
     assert(False == r1) 
@@ -171,8 +178,7 @@ def test_dist():
 
 def test_half():
     data = DATA(options['file'])
-    left,right,A,B,mid,c = data.half() 
-
+    left,right,A,B,mid,c,_ = data.half() 
     print(len(left),len(right))
     l,r = data.clone(left), data.clone(right)
     print(A.cells, c)
