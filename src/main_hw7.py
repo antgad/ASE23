@@ -303,7 +303,40 @@ def test_six():
             RX([101,100,99,101,100,101,100,99,101,100],"rx4")])):
         print(rx.name,rx.rank,rx.show)
 
+def test_tiles():
+    rxs,a,b,c,d,e,f,g,h,j,k=[],[],[],[],[],[],[],[],[],[],[]
+    a = [gaussian(10,1) for _ in range(1000)]       # 1
+    b = [gaussian(10.1,1) for _ in range(1000)]     # 2
+    c = [gaussian(20,1) for _ in range(1000)]       # 3
+    d = [gaussian(30,1) for _ in range(1000)]       # 4
+    e = [gaussian(30.1,1) for _ in range(1000)]     # 5
+    f = [gaussian(10,1) for _ in range(1000)]       # 6
+    g = [gaussian(10,1) for _ in range(1000)]       # 7
+    h = [gaussian(40,1) for _ in range(1000)]       # 8
+    j = [gaussian(40,3) for _ in range(1000)]       # 9
+    k = [gaussian(10,1) for _ in range(1000)]       # 10
+    for i,v in enumerate([a,b,c,d,e,f,g,h,j,k]):
+        rxs.append(RX(v, "rx" + str(i+1)))
+    rxs.sort(key = lambda x: x.mid())
+    for rx in tiles(rxs):
+        print("",rx.name,rx.show)
 
+def test_sk():
+    rxs = []
+    a = [gaussian(10,1) for _ in range(1000)]       # 1
+    b = [gaussian(10.1,1) for _ in range(1000)]     # 2
+    c = [gaussian(20,1) for _ in range(1000)]       # 3
+    d = [gaussian(30,1) for _ in range(1000)]       # 4
+    e = [gaussian(30.1,1) for _ in range(1000)]     # 5
+    f = [gaussian(10,1) for _ in range(1000)]       # 6
+    g = [gaussian(10,1) for _ in range(1000)]       # 7
+    h = [gaussian(40,1) for _ in range(1000)]       # 8
+    j = [gaussian(40,3) for _ in range(1000)]       # 9
+    k = [gaussian(10,1) for _ in range(1000)]       # 10
+    for i,v in enumerate([a,b,c,d,e,f,g,h,j,k]):
+        rxs.append(RX(v, "rx" + str(i+1)))
+    for rx in tiles(scottKnot(rxs)):
+        print("",rx.rank,rx.name,rx.show)
 
 
 eg("ok","set randomseed", test_ok)
@@ -315,7 +348,8 @@ eg('bootmu', 'test bootstrap', test_bootmu)
 eg('pre', 'test bootstrap eg3', test_pre)
 eg('five', 'test tiles and scottKnot', test_five)
 eg('six', 'test tiles and scottKnot', test_six)
-
+eg('tiles', 'test tiles', test_tiles)
+eg('sk', 'test scottKnot', test_sk)
 # eg('rand', 'demo random number generation', test_rand)
 
 # eg("some","demo of reservoir sampling", test_some)
@@ -336,3 +370,14 @@ eg('six', 'test tiles and scottKnot', test_six)
 
 main(egs)
 
+# tiles
+# 	rx6	 -*-               |                     {  8.79,   9.46,   9.97,  10.52,  11.29}
+# 	rx1	 -*-               |                     {  8.67,   9.43,  10.00,  10.54,  11.23}
+# 	rx10	 -*-               |                     {  8.75,   9.52,  10.03,  10.52,  11.33}
+# 	rx7	 -*-               |                     {  8.81,   9.51,  10.03,  10.51,  11.22}
+# 	rx2	 -*-               |                     {  8.84,   9.58,  10.04,  10.59,  11.40}
+# 	rx3	          -*--     |                     { 18.69,  19.45,  19.99,  20.50,  21.36}
+# 	rx4	                   |-*-                  { 28.71,  29.41,  29.97,  30.48,  31.22}
+# 	rx5	                   |-*-                  { 28.75,  29.50,  30.00,  30.58,  31.29}
+# 	rx9	                   |       ---* ---      { 36.13,  38.43,  39.90,  41.55,  43.83}
+# 	rx8	                   |         -*--        { 38.71,  39.51,  39.98,  40.46,  41.28}
