@@ -92,7 +92,7 @@ def test_some():
     num1 = NUM.NUM()
     for i in range(1,10001):
         num1.add(i)
-    #print(num1.has)
+    # oo(num1.has)
 
 def test_num():
     num1, num2 = NUM.NUM(), NUM.NUM()
@@ -162,10 +162,8 @@ def test_cliffs():
     j = 1.0
     while (not diff):
         def function(x):
-            return x*1.0
-        print(type(function))
-        print(type(t1))
-        t3=list(utils.map(function, t1))
+            return x*j
+        t3=list(map(function, t1))
         rx = cliffsDelta(t1,t3) > options['cliffs']
         diff= rx
         print(">",rnd(j),diff) 
@@ -180,8 +178,7 @@ def test_dist():
 
 def test_half():
     data = DATA(options['file'])
-    left,right,A,B,mid,c = data.half() 
-
+    left,right,A,B,mid,c,_ = data.half() 
     print(len(left),len(right))
     l,r = data.clone(left), data.clone(right)
     print(A.cells, c)

@@ -69,9 +69,9 @@ def cosine(a,b,c):
 
 ## Lists
 
-def map(fun,src):
-    for i in src:
-        fun(i)
+# def map(fun,src): # Skip this and use the python inbuilt map function
+#     for i in src:
+#         fun(i)
 
 def kap(t, fun):
     u={}
