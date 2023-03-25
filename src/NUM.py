@@ -17,6 +17,7 @@ class NUM:
         self.has = {}
         self.ok = True
         self.config={}
+        self.sd=0
         with open('config.json') as json_file:
             self.config = json.load(json_file)
 
@@ -40,6 +41,7 @@ class NUM:
             if pos:
                 self.has[pos] = x
                 self.ok = False
+            self.sd = 0 if self.n<2 else (self.m2/(self.n - 1))**0.5
 
     def has_f(self):
         temp = list(dict(sorted(self.has.items(),key=lambda k: k[1])).values())
