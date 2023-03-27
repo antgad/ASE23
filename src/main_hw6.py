@@ -33,13 +33,11 @@ ACTIONS:
 """
 
 def main(funs,saved={},fails=0):
-    print("temp")
     options.cli_setting(help)
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
-    print('json dumped')
     if options['help']:
         print(help)
     
@@ -194,7 +192,7 @@ def test_tree():
 
 def test_sway():
     data = DATA(options['file'])
-    best,rest = data.sway()
+    best,rest,_ = data.sway()
     print("\nall ", data.stats(data.cols.y, 2, what="mid"))
     print("", data.stats(data.cols.y, 2, what="div"))
     print("\nbest",best.stats(best.cols.y, 2, what="mid"))
@@ -205,7 +203,7 @@ def test_sway():
 def test_bins():
     b4 = None
     data = DATA(options['file'])
-    best,rest = data.sway()
+    best,rest,_ = data.sway()
     print("all","","","",{'best':len(best.rows), 'rest':len(rest.rows)})
     for k,t in enumerate(bins(data.cols.x,{'best':best.rows, 'rest':rest.rows})):
         for range in t:
@@ -222,28 +220,25 @@ def test_xpln():
     rule,most= data.xpln(best,rest)
     if rule:
         print("\n-----------\nexplain=", o(showRule(rule)))
-        data1= DATA(data,selects(rule,data.rows))
-        # print("all               ",o(data.stats()),o(data.stats(div)))
-        # print(fmt("sway with %5s evals",evals),o(stats(best)),o(stats(best,div)))
-        # print(fmt("xpln on   %5s evals",evals),o(stats(data1)),o(stats(data1,div)))
-        # top,_ = betters(data, #best.rows)
-        # top = DATA(data,top)
-        # print(fmt("sort with %5s evals",#data.rows) ,o(stats(top)), o(stats(top,div)))
-    return False
+        selects = utils.selects(rule,data.rows)
+        data_selects = [s for s in selects if s!=None]
+        data1 = data.clone(data_selects)
+        print('all               ',o(data.stats(data.cols.y,2,what='mid')), o(data.stats(data.cols.y,2,what='div')))
+        print('sway with',evals,'evals', o(best.stats(best.cols.y,2,what='mid'), o(best.stats(best.cols.y,2,what='div'))))
+        print('xpln on',evals,'evals', o(data1.stats(data1.cols.y,2,what='mid'), o(data1.stats(data1.cols.y,2,what='div'))))
+        top,_ = data.betters(len(best.rows))
+        top = data.clone(top)
+        print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
 
-eg("Is","show options", disp_setting)
 
+eg('the','show options', disp_setting)
 eg('rand', 'demo random number generation', test_rand)
-
 eg("some","demo of reservoir sampling", test_some)
-
 eg('nums', 'demo of NUM', test_num)
 eg('sym', 'demo SYMS', test_sym)
-
 eg('csv', 'reading csv files', test_csv)
 eg('data', 'showing DATA sets', test_data)
 eg('clone', 'replicate structure of a DATA', test_clone)
-
 eg('cliffs', 'start tests', test_cliffs)
 eg('dist', 'distance test', test_dist)
 eg('half', 'divide data in half', test_half)

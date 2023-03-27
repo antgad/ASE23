@@ -44,11 +44,9 @@ class DATA:
     def stats(self, cols, nPlaces, what): 
         cols = cols if cols else self.cols.y
         def fun(_, col ):
-            #print(col)
             return col.rnd(getattr(col,what)(),nPlaces), col.txt
         return utils.kap(cols,fun)
     
-
     def better(self,row1,row2):
         s1,s2=0,0
         ys=self.cols.y
@@ -71,7 +69,7 @@ class DATA:
         cols =  cols if cols else self.cols.x
         def function(row2):
             return {"row": row2, "dist":self.dist(row1,row2,cols)}
-        return sorted(list(map(function,rows)),key=lambda k: k['dist'])
+        return sorted(list(map(function,rows or self.rows)),key=lambda k: k['dist'])
 
 
     def half(self,rows=None,cols=None,above=None):
@@ -114,8 +112,7 @@ class DATA:
             evals = 2
         return left,right,A,B,mid,c, evals
 
-
-    '''def cluster(self,rows=None,min=None,cols=None,above=None):
+    def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
         cols=cols if cols else self.cols.x
         min = min or len(rows)**self.config['min']
@@ -125,12 +122,11 @@ class DATA:
             left,right,node['A'],node['B'],node['mid'], _ = self.half(rows,cols,above)
             node['left']= self.cluster(rows=left, min=min, cols=cols, above=node['A'])
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
-        return node'''
-    
-    
+        return node
+        
     def sway(self,rows=None, min=None, cols=None, above=None):
         data = self
-        def worker(rows, worse, evals0, above=None):
+        def worker(rows, worse, evals0=None, above=None):
             if len(rows) <= len(data.rows)**self.config['min']:
                 return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
@@ -166,14 +162,13 @@ class DATA:
         if n>0:
             return rule
         
-    def Rule(self,ranges, max_size):
+    def Rule(self,ranges,max_size):
         t={}
         for r in ranges:
-            if r.txt not in t:
-                t[r.txt]=[]
-            t[r.txt].append({'lo':r.lo,'hi':r.hi,'at':r.at})
+            t[r['txt']] = t.get(r['txt']) or []
+            t[r['txt']].append({'lo':r['lo'],'hi':r['hi'],'at':r['at']})
         return self.prune(t,max_size)
-        
+    
     def xpln(self,best,rest):
         temp = []
         max_size = {}
@@ -187,12 +182,12 @@ class DATA:
                 restr = utils.selects(rule, rest.rows)
                 if len(bestr) + len(restr) >0:
                     return v({'best':len(bestr), 'rest': len(restr)}) , rule
-        for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows},self.config):
-            max_size[ranges[1].txt] = len(ranges)
-            print()
+        for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
+            max_size[ranges[1]['txt']] = len(ranges)
+            print("")
             for r in ranges:
-                print(r.txt, r.lo, r.hi)
-                val = v(r.y.has)
+                print(r['txt'], r['lo'], r['hi'])
+                val = v(r['y'].has)
                 temp.append({'range': r, 'max': len(ranges), 'val': val})
         rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)
         return rule, most

@@ -4,8 +4,6 @@
 from math import inf,pow
 from utils import rnd, rand, rint
 import json
-
-
 class NUM:
 
     def __init__(self, at = 0, txt = ""):
@@ -20,33 +18,16 @@ class NUM:
         with open('config.json') as json_file:
             self.config = json.load(json_file)
 
-    
-    def add(self, x,n=1): # add `n`, update lo,hi and stuff needed for standard deviation
-        if x != '?':
+    def add(self, n): # add `n`, update lo,hi and stuff needed for standard deviation
+        if n != '?':
             self.n  = self.n + 1
-            d = x - self.mu
-            self.mu += d/self.n
-            self.m2 += d*(n - self.mu)
-            self.lo = min(x, self.lo)
-            self.hi = max(x, self.hi) 
-            all = len(self.has)
-            t= rand()[0]
-            if self.config["Max"] > all:
-                pos = all+1
-            elif t<self.config['Max']/self.n:
-                pos = rint(1,all)
-            else: 
-                pos = 0
-            if pos:
-                self.has[pos] = x
-                self.ok = False
-
-    def has_f(self):
-        temp = list(dict(sorted(self.has.items(),key=lambda k: k[1])).values())
-        self.ok = True
-        return temp
-
-            
+            if self.n <= self.config['Max']:
+                self.has[n] = n
+            d = n - self.mu
+            self.mu = self.mu + d/self.n
+            self.m2 = self.m2 + d*(n - self.mu)
+            self.lo = min(n, self.lo)
+            self.hi = max(n, self.hi)
     
     def mid(self): # return the mean
         return self.mu

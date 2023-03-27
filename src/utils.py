@@ -9,9 +9,6 @@ import io
 from copy import deepcopy
 import json
 import random
-# import OPTIONS
-# options=OPTIONS.OPTIONS()
-
 config= {}
 
 ## Show
@@ -21,7 +18,7 @@ def __init__(self, src):
 
 def show(node, what=None, cols=None, nPlaces=1, lvl=0):
     if node:
-        print("|" * lvl + str(len(node['data'.rows])) + " ", end='')
+        print("|..." * lvl + str(len(node['data'].rows)) + " ", end='')
         if (not node.get('left')) or (lvl==0):
             print(o(node['data'].stats(node['data'].cols.y,nPlaces, what=what)))
         else: 
@@ -230,21 +227,19 @@ def bins(cols,rowss):
             for row in rows:
                 x = row.cells[col.at]
                 if (x != "?"):
-                    k = int(bin(col,x))
+                    k = int(bin(col, x))
                     if not k in ranges:
                         ranges[k] = RANGE(col.at,col.txt,x)
                     extend(ranges[k], x, y)
-        ranges = list(dict(sorted(ranges.items(), key = lambda k:k[1].lo)).values())
+        ranges = list(dict(sorted(ranges.items())).values())
         r = ranges if isinstance(col, SYM.SYM) else mergeAny(ranges)
         out.append(r)
     return out
 
-def bin(self,col, x):
-    with open('config.json') as json_file:
-        config = json.load(json_file)
+def bin(col,x):
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(self.config['bins']-1)
+    tmp = (col.hi - col.lo)/(16-1)
     if col.hi == col.lo:
         return 1
     else:
@@ -328,7 +323,7 @@ def showRule(rule):
                 left['hi'] = right['hi']
                 j += 1
             t.append({'lo': left['lo'], 'hi': left['hi']})
-            J += 1
+            j += 1
         return t if len(t0) == len(t) else merge(t)
     def merges(attr, ranges):
         return list(map(pretty,merge(sorted(ranges, key =  lambda k: k['lo'])))), attr
@@ -340,8 +335,8 @@ def showRule(rule):
 def selects(rule, rows):
     def disjunction(ranges, row):
         for range in ranges:
-            lo,hi,at = range['lo'], range['hi'], range['ar']
-            x = row.cells['at']
+            lo,hi,at = range['lo'], range['hi'], range['at']
+            x = row.cells[at]
             if (x == '?') or (lo == hi == x) or (lo <= x and x < hi):
                 return True
         return False
@@ -371,25 +366,25 @@ def diffs(nums1,nums2):
 
 def firstN(sortedRanges,scoreFun):
     def printRange(r):
-        print(r['range'].txt, r['range'].lo, r['range'].hi, rnd(r['val']), dict(r['range'].y.has))
+        print(r['range']['txt'], r['range']['lo'], r['range']['hi'], rnd(r['val']), dict(r['range']['y'].has))
     print()
-    map( printRange, sortedRanges)
+    list(map( printRange, sortedRanges))
     first = sortedRanges[0]['val']
     print()
+    first = sortedRanges[0]['val']
     def useful(range):
         if range['val'] > 0.05 and range['val'] > first/10:
             return range
-    
-    sortedRanges = list(map(useful, sortedRanges))
+    sortedRanges = [x for x in sortedRanges if useful(x)]
     most, out = -1, -1
-    sortedRanges = [i for i  in sortedRanges if i != None]
     for n in range(1, len(sortedRanges)+1):
-        temp, rule = scoreFun(i['range'] for i in sortedRanges[:n])
+        slice = sortedRanges[0:n]
+        slice_range = [x['range'] for x in slice]
+
+        temp, rule = scoreFun(slice_range)
         if temp and temp>most:
             out, most = rule, temp
     return out, most
-
-
 
 
 
