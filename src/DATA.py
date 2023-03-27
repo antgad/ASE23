@@ -2,7 +2,7 @@ from ROW import ROW
 from COLS import COLS
 import utils
 import math
-
+import functools
 import json
 import random
 
@@ -40,16 +40,13 @@ class DATA:
         _ = list(map(lambda x: data.add(x), init if init!=None else []))
         return data
     
+    # TODO: modify
     def stats(self, cols, nPlaces, what): 
+        cols = cols if cols else self.cols.y
         def fun(_, col ):
-            if what=='div':
-                value= col.div()
-            else:
-                value=col.mid()
-            return col.rnd(value,nPlaces), col.txt
-        return utils.kap(cols or self.cols.y,fun)
+            return col.rnd(getattr(col,what)(),nPlaces), col.txt
+        return utils.kap(cols,fun)
     
-
     def better(self,row1,row2):
         s1,s2=0,0
         ys=self.cols.y
@@ -80,9 +77,12 @@ class DATA:
             return self.dist(row1,row2,cols)
         
         rows = rows if rows else self.rows
-        some = utils.many(rows,self.config['Halves'])
+        some = utils.many(rows,self.config['Halves'],self.config['seed'])
 
-        A = above or utils.any(some)
+        if self.config['Reuse']:
+            A=above
+        if not above or not self.config['Reuse']:
+            A=utils.any(some, self.config['seed'])
         B = self.around(A,some)[int(self.config['Far'] * len(rows))//1]['row']
         c = dist(A,B)
         left,right=[],[]
@@ -99,14 +99,18 @@ class DATA:
             return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c)}
         
         mid=None
+        evals = 0
         for n,temp in enumerate(sorted(list(map(project,rows)),key = lambda k:k['dist'])):
-            if n<len(rows)//2:
+            if n<=len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
             else:
                 right.append(temp['row'])
-        return left,right,A,B,mid,c
-
+        if self.config['Reuse'] and above:
+            evals = 1
+        else: 
+            evals = 2
+        return left,right,A,B,mid,c, evals
 
     def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
@@ -119,22 +123,21 @@ class DATA:
             node['left']= self.cluster(rows=left, min=min, cols=cols, above=node['A'])
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
         return node
-    
-
+        
     def sway(self,rows=None, min=None, cols=None, above=None):
         data = self
-        def worker(rows, worse, above=None):
+        def worker(rows, worse, evals0=None, above=None):
             if len(rows) <= len(data.rows)**self.config['min']:
-                return rows, utils.many(worse, self.config['rest']*len(rows))
+                return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
-                l,r,A,B,C,D = self.half(rows=rows, cols=None, above=above)
+                l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above)
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:
                     worse.append(row)
-                return worker(l,worse,A)
-        best, rest = worker(data.rows,[])
-        return self.clone(best), self.clone(rest)
+                return worker(l,worse,evals+evals0,A)
+        best, rest, evals = worker(data.rows,[],0)
+        return self.clone(best), self.clone(rest), evals
     
     def tree(self, rows=None , min=None, cols=None, above=None):
         rows = rows if rows else self.rows
@@ -143,8 +146,56 @@ class DATA:
         node = {'data':self.clone(rows)}
         if len(rows)>2*min:
 
-            left, right, node['A'], node['B'], node['mid'], _ =self.half(rows, cols, above)
+            left, right, node['A'], node['B'], node['mid'], _,_ =self.half(rows, cols, above)
             node['left'] = self.tree(left, min, cols, node['A'])
             node['right'] = self.tree(right, min, cols, node['B'])
         return node
+    
+
+    def prune(self,rule,max_size):
+        n=0
+        for txt,r in rule.items():
+            n+=1
+            if len(r) == max_size[txt]:
+                n+=1
+                rule[txt] = None
+        if n>0:
+            return rule
+        
+    def Rule(self,ranges,max_size):
+        t={}
+        for r in ranges:
+            t[r['txt']] = t.get(r['txt']) or []
+            t[r['txt']].append({'lo':r['lo'],'hi':r['hi'],'at':r['at']})
+        return self.prune(t,max_size)
+    
+    def xpln(self,best,rest):
+        temp = []
+        max_size = {}
+        def v(has):
+            return utils.value(has,len(best.rows),len(rest.rows),'best')
+        def score(ranges):
+            rule = self.Rule(ranges,max_size)
+            if rule:
+                print(utils.showRule(rule))
+                bestr = utils.selects(rule, best.rows)
+                restr = utils.selects(rule, rest.rows)
+                if len(bestr) + len(restr) >0:
+                    return v({'best':len(bestr), 'rest': len(restr)}) , rule
+        for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
+            max_size[ranges[1]['txt']] = len(ranges)
+            print("")
+            for r in ranges:
+                print(r['txt'], r['lo'], r['hi'])
+                val = v(r['y'].has)
+                temp.append({'range': r, 'max': len(ranges), 'val': val})
+        rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)
+        return rule, most
+    def betters(self,n):
+        sorted_rows = list(sorted(self.rows, key=functools.cmp_to_key(self.better)))
+        return n and sorted_rows[:n], sorted_rows[n+1:] or sorted_rows
+
+
+
+
     
