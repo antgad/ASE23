@@ -83,6 +83,7 @@ class DATA:
             A=above
         if not above or not self.config['Reuse']:
             A=utils.any(some, self.config['seed'])
+        print(int(self.config['Far'] * len(rows))//1, len(some))
         B = self.around(A,some)[int(self.config['Far'] * len(rows))//1]['row']
         c = dist(A,B)
         left,right=[],[]
@@ -157,16 +158,17 @@ class DATA:
         for txt,r in rule.items():
             n+=1
             if len(r) == max_size[txt]:
-                n+=1
+                n-=1
                 rule[txt] = None
         if n>0:
-            return rule
+            return {k:v for k, v in rule.items() if v!=None}
         
     def Rule(self,ranges,max_size):
         t={}
         for r in ranges:
             t[r['txt']] = t.get(r['txt']) or []
             t[r['txt']].append({'lo':r['lo'],'hi':r['hi'],'at':r['at']})
+        print(t)
         return self.prune(t,max_size)
     
     def xpln(self,best,rest):
@@ -183,7 +185,7 @@ class DATA:
                 if len(bestr) + len(restr) >0:
                     return v({'best':len(bestr), 'rest': len(restr)}) , rule
         for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
-            max_size[ranges[1]['txt']] = len(ranges)
+            max_size[ranges[0]['txt']] = len(ranges)
             print("")
             for r in ranges:
                 print(r['txt'], r['lo'], r['hi'])
