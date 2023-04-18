@@ -208,6 +208,7 @@ def test_sway():
     print("", rest.stats(rest.cols.y, 2, what="div"))
 
 def test_bins():
+    print("\n\nin bins")
     b4 = None
     data = DATA(options['file'])
     best,rest,_ = data.sway()
@@ -222,6 +223,7 @@ def test_bins():
             range['y'].has)
 
 def test_xpln():
+    
     data = DATA(options['file'])
     best,rest, evals = data.sway()
     rule,most= data.xpln(best,rest)
@@ -238,18 +240,18 @@ def test_xpln():
         print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
 
 
-eg('the','show options', disp_setting)
-eg('rand', 'demo random number generation', test_rand)
-eg("some","demo of reservoir sampling", test_some)
-eg('nums', 'demo of NUM', test_num)
-eg('sym', 'demo SYMS', test_sym)
-eg('csv', 'reading csv files', test_csv)
-eg('data', 'showing DATA sets', test_data)
-eg('clone', 'replicate structure of a DATA', test_clone)
-eg('cliffs', 'start tests', test_cliffs)
-eg('dist', 'distance test', test_dist)
-eg('half', 'divide data in half', test_half)
-eg('tree', 'make snd show tree of clusters', test_tree)
+#eg('the','show options', disp_setting)
+#eg('rand', 'demo random number generation', test_rand)
+#eg("some","demo of reservoir sampling", test_some)
+#eg('nums', 'demo of NUM', test_num)
+#eg('sym', 'demo SYMS', test_sym)
+#eg('csv', 'reading csv files', test_csv)
+#eg('data', 'showing DATA sets', test_data)
+#eg('clone', 'replicate structure of a DATA', test_clone)
+#eg('cliffs', 'start tests', test_cliffs)
+#eg('dist', 'distance test', test_dist)
+#eg('half', 'divide data in half', test_half)
+#eg('tree', 'make snd show tree of clusters', test_tree)
 eg('sway', 'optimizing', test_sway)
 eg('bins', 'find deltas between best and rest', test_bins)
 eg("xpln","explore explanation sets", test_xpln)

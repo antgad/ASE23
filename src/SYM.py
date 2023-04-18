@@ -22,6 +22,7 @@ class SYM:
     
     def mid(self): # return the mode
         return self.mode
+
     
     def div(self): # return the entropy
         def fun(p): return p*log(p, 2)

@@ -227,7 +227,7 @@ def bins(cols,rowss):
             for row in rows:
                 x = row.cells[col.at]
                 if (x != "?"):
-                    k = int(bin(col, x))
+                    k = (bin(col, x))
                     if not k in ranges:
                         ranges[k] = RANGE(col.at,col.txt,x)
                     extend(ranges[k], x, y)
@@ -237,9 +237,11 @@ def bins(cols,rowss):
     return out
 
 def bin(col,x):
+    with open('config.json') as json_file:
+        config = json.load(json_file)
     if (x=="?") or (isinstance(col, SYM.SYM)):
         return x
-    tmp = (col.hi - col.lo)/(16-1)
+    tmp = (col.hi - col.lo)/(config['bins']-1)
     if col.hi == col.lo:
         return 1
     else:

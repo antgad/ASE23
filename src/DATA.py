@@ -41,7 +41,7 @@ class DATA:
         return data
     
     # TODO: modify
-    def stats(self, cols, nPlaces, what): 
+    def stats(self, cols=None, nPlaces=2, what='mid'): 
         cols = cols if cols else self.cols.y
         def fun(_, col ):
             return col.rnd(getattr(col,what)(),nPlaces), col.txt
@@ -51,6 +51,8 @@ class DATA:
         s1,s2=0,0
         ys=self.cols.y
         for col in ys:
+            print()
+            print(ys)
             x = col.norm(row1.cells[col.at])
             y = col.norm(row2.cells[col.at])
             s1 -= math.exp(col.w * (x-y)/len(ys))
@@ -79,30 +81,31 @@ class DATA:
         rows = rows if rows else self.rows
         some = utils.many(rows,self.config['Halves'],self.config['seed'])
 
-        if self.config['Reuse']:
+        if self.config['Reuse'] and above:
             A=above
-        if not above or not self.config['Reuse']:
+        else:
             A=utils.any(some, self.config['seed'])
         print(int(self.config['Far'] * len(rows))//1, len(some))
-        B = self.around(A,some)[int(self.config['Far'] * len(rows))//1]['row']
-        c = dist(A,B)
+        temp=self.around(A,some)
+        B = temp[int(self.config['Far'] * (len(temp) -1 ))//1]['row']
+        c = temp[int(self.config['Far'] * (len(temp) -1 ))//1]['dist']#dist(A,B)
         left,right=[],[]
 
         def project(row):
-            x,y = utils.cosine(dist(row,A), dist(row,B),c)
+            '''x,y = utils.cosine(dist(row,A), dist(row,B),c)
             # row.__setattr__('x', x)
             if 'x' not in vars(row).keys() or not row.x:
                 row.__setattr__('x', x)
             if 'y' not in vars(row).keys() or not row.y:
                 row.__setattr__('y', y)
             row.x = row.x if row.x else x
-            row.y = row.y if row.y else y
+            row.y = row.y if row.y else y'''
             return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c)}
         
         mid=None
         evals = 0
-        for n,temp in enumerate(sorted(list(map(project,rows)),key = lambda k:k['dist'])):
-            if n<=len(rows)//2:
+        for n,temp in enumerate(sorted((map(project,rows)),key = lambda k:k['dist'])):
+            if n+1 <= len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
             else:
@@ -111,7 +114,7 @@ class DATA:
             evals = 1
         else: 
             evals = 2
-        return left,right,A,B,mid,c, evals
+        return left,right,A,B,c,mid, evals
 
     def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
@@ -120,7 +123,7 @@ class DATA:
         node = {'data' : self.clone(rows)}
         
         if len(rows)>=2*min:    
-            left,right,node['A'],node['B'],node['mid'], _ = self.half(rows,cols,above)
+            left,right,node['A'],node['B'],node['c'],node['mid'], _ = self.half(rows,cols,above)
             node['left']= self.cluster(rows=left, min=min, cols=cols, above=node['A'])
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
         return node
@@ -132,6 +135,7 @@ class DATA:
                 return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
                 l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above)
+                #print(l,r,A,B,C)
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:
