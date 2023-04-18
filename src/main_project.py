@@ -239,7 +239,7 @@ def test_xpln():
     best,rest, evals = data.sway()
     rule,most= data.xpln(best,rest)
     print("{+++++++++++++XPLN++++++++++++++++++}")
-    if rule:
+    if rule and rule!=-1:
         print("\n-----------\nexplain =", o(showRule(rule)))
         selects = utils.selects(rule,data.rows)
         data_selects = [s for s in selects if s!=None]
@@ -250,6 +250,8 @@ def test_xpln():
         top,_ = data.betters(len(best.rows))
         top = data.clone(top)
         print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
+    else:
+        print("No Rules Found :( Try Again)")
 
 
 #eg('the','show options', disp_setting)

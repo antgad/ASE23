@@ -192,7 +192,7 @@ class DATA:
                 print(r['txt'], r['lo'], r['hi'])
                 val = v(r['y'].has)
                 temp.append({'range': r, 'max': len(ranges), 'val': val})
-        rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)
+        rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)        
         return rule, most
     def betters(self,n):
         sorted_rows = list(sorted(self.rows, key=functools.cmp_to_key(self.better)))
