@@ -16,7 +16,6 @@ class DATA:
         self.config={}
         with open('config.json') as json_file:
             self.config = json.load(json_file)
-        print(self.config['file'])
         def fun(x): 
             self.add(x)
         if type(src)==str:
@@ -181,12 +180,14 @@ class DATA:
             return utils.value(has,len(best.rows),len(rest.rows),'best')
         def score(ranges):
             rule = self.Rule(ranges,max_size)
+
             if rule:
                 print(utils.showRule(rule))
                 bestr = utils.selects(rule, best.rows)
                 restr = utils.selects(rule, rest.rows)
                 if len(bestr) + len(restr) >0:
                     return v({'best':len(bestr), 'rest': len(restr)}) , rule
+                return None,None
         for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
             max_size[ranges[0]['txt']] = len(ranges)
             print("")
