@@ -21,6 +21,7 @@ class NUM:
     def add(self, n): # add `n`, update lo,hi and stuff needed for standard deviation
         if n != '?':
             self.n  = self.n + 1
+
             if self.n <= self.config['Max']:
                 self.has[n] = n
             d = n - self.mu

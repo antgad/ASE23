@@ -41,7 +41,7 @@ class DATA:
         return data
     
     # TODO: modify
-    def stats(self, cols, nPlaces, what): 
+    def stats(self, cols=None, nPlaces=2, what='mid'): 
         cols = cols if cols else self.cols.y
         def fun(_, col ):
             return col.rnd(getattr(col,what)(),nPlaces), col.txt
@@ -79,30 +79,30 @@ class DATA:
         rows = rows if rows else self.rows
         some = utils.many(rows,self.config['Halves'],self.config['seed'])
 
-        if self.config['Reuse']:
+        if self.config['Reuse'] and above:
             A=above
-        if not above or not self.config['Reuse']:
+        else:
             A=utils.any(some, self.config['seed'])
-        print(int(self.config['Far'] * len(rows))//1, len(some))
-        B = self.around(A,some)[int(self.config['Far'] * len(rows))//1]['row']
-        c = dist(A,B)
+        temp=self.around(A,some)
+        B = temp[int(self.config['Far'] * (len(temp) -1 ))//1]['row']
+        c = temp[int(self.config['Far'] * (len(temp) -1 ))//1]['dist']#dist(A,B)
         left,right=[],[]
 
         def project(row):
-            x,y = utils.cosine(dist(row,A), dist(row,B),c)
+            '''x,y = utils.cosine(dist(row,A), dist(row,B),c)
             # row.__setattr__('x', x)
             if 'x' not in vars(row).keys() or not row.x:
                 row.__setattr__('x', x)
             if 'y' not in vars(row).keys() or not row.y:
                 row.__setattr__('y', y)
             row.x = row.x if row.x else x
-            row.y = row.y if row.y else y
+            row.y = row.y if row.y else y'''
             return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c)}
         
         mid=None
         evals = 0
-        for n,temp in enumerate(sorted(list(map(project,rows)),key = lambda k:k['dist'])):
-            if n<=len(rows)//2:
+        for n,temp in enumerate(sorted((map(project,rows)),key = lambda k:k['dist'])):
+            if n+1 <= len(rows)//2:
                 left.append(temp["row"])
                 mid=temp['row']
             else:
@@ -111,7 +111,7 @@ class DATA:
             evals = 1
         else: 
             evals = 2
-        return left,right,A,B,mid,c, evals
+        return left,right,A,B,c,mid, evals
 
     def cluster(self,rows=None,min=None,cols=None,above=None):
         rows= rows if rows else self.rows
@@ -120,7 +120,7 @@ class DATA:
         node = {'data' : self.clone(rows)}
         
         if len(rows)>=2*min:    
-            left,right,node['A'],node['B'],node['mid'], _ = self.half(rows,cols,above)
+            left,right,node['A'],node['B'],node['c'],node['mid'], _ = self.half(rows,cols,above)
             node['left']= self.cluster(rows=left, min=min, cols=cols, above=node['A'])
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
         return node
@@ -168,7 +168,6 @@ class DATA:
         for r in ranges:
             t[r['txt']] = t.get(r['txt']) or []
             t[r['txt']].append({'lo':r['lo'],'hi':r['hi'],'at':r['at']})
-        print(t)
         return self.prune(t,max_size)
     
     def xpln(self,best,rest):
@@ -178,12 +177,14 @@ class DATA:
             return utils.value(has,len(best.rows),len(rest.rows),'best')
         def score(ranges):
             rule = self.Rule(ranges,max_size)
+
             if rule:
-                print(utils.showRule(rule))
+                utils.oo(utils.showRule(rule))
                 bestr = utils.selects(rule, best.rows)
                 restr = utils.selects(rule, rest.rows)
                 if len(bestr) + len(restr) >0:
                     return v({'best':len(bestr), 'rest': len(restr)}) , rule
+            return None,None
         for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
             max_size[ranges[0]['txt']] = len(ranges)
             print("")
@@ -191,7 +192,7 @@ class DATA:
                 print(r['txt'], r['lo'], r['hi'])
                 val = v(r['y'].has)
                 temp.append({'range': r, 'max': len(ranges), 'val': val})
-        rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)
+        rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)        
         return rule, most
     def betters(self,n):
         sorted_rows = list(sorted(self.rows, key=functools.cmp_to_key(self.better)))
