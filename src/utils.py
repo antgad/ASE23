@@ -327,9 +327,6 @@ def showRule(rule):
         return list(map(pretty,merge(sorted(ranges, key =  lambda k: k['lo'])))), attr
     return kap(rule, merges)
 
-
-    pass
-
 def selects(rule, rows):
     def disjunction(ranges, row):
         for range in ranges:
@@ -349,7 +346,6 @@ def selects(rule, rows):
             return r
     return(list(map(fun,rows)))
 
-    pass
 
 def per(t,p=0.5):
     p=math.floor(p*len(t))+0.5
