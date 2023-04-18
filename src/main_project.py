@@ -7,6 +7,7 @@ from utils import *
 import utils
 from grid_utils import *
 import json
+import pandas as pd
 options=OPTIONS.OPTIONS()
 help="""
 xpln: multi-goal semi-supervised explanation
@@ -39,6 +40,15 @@ def main(funs,saved={},fails=0):
     file_num = int(input("Enter file_num:"))
     file_list = ["auto2.csv", "auto93.csv", "china.csv", "coc1000.csv", "coc10000.csv", "healthCloseIsses12mths0001-hard.csv", "healthCloseIsses12mths0011-easy.csv", "nasa93dem.csv", "pom.csv", "SSM.csv", "SSN.csv"] 
     options['file'] = "../etc/project_data/" + file_list[file_num]
+    df=pd.read_csv(options['file'],na_values='?')
+    df.columns = df.columns.str.strip()
+    for col in df.columns:
+        if df[col].dtype.kind in 'biufc':
+            temp=int(df[col].mean())
+            df[col].fillna(temp,inplace=True)
+    options['file']=options['file'][:-4]+"_updated.csv"
+    df.to_csv(options['file'],index=False)
+    print("saved")
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:
@@ -198,6 +208,7 @@ def test_tree():
 
 
 def test_sway():
+    print("{+++++++++++++SWAY++++++++++++++++++}")
     data = DATA(options['file'])
     best,rest,_ = data.sway()
     print("\nall ", data.stats(data.cols.y, 2, what="mid"))
@@ -208,6 +219,7 @@ def test_sway():
     print("", rest.stats(rest.cols.y, 2, what="div"))
 
 def test_bins():
+    print("{+++++++++++++BINS++++++++++++++++++}")
     b4 = None
     data = DATA(options['file'])
     best,rest,_ = data.sway()
@@ -222,10 +234,12 @@ def test_bins():
             range['y'].has)
 
 def test_xpln():
+    print("{+++++++++++++XPLN++++++++++++++++++}")
     data = DATA(options['file'])
     best,rest, evals = data.sway()
     rule,most= data.xpln(best,rest)
-    if rule:
+    print("{+++++++++++++XPLN++++++++++++++++++}")
+    if rule and rule!=-1:
         print("\n-----------\nexplain =", o(showRule(rule)))
         selects = utils.selects(rule,data.rows)
         data_selects = [s for s in selects if s!=None]
@@ -236,22 +250,24 @@ def test_xpln():
         top,_ = data.betters(len(best.rows))
         top = data.clone(top)
         print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
+    else:
+        print("No Rules Found :( Try Again)")
 
 
-eg('the','show options', disp_setting)
-eg('rand', 'demo random number generation', test_rand)
-eg("some","demo of reservoir sampling", test_some)
-eg('nums', 'demo of NUM', test_num)
-eg('sym', 'demo SYMS', test_sym)
-eg('csv', 'reading csv files', test_csv)
-eg('data', 'showing DATA sets', test_data)
-eg('clone', 'replicate structure of a DATA', test_clone)
-eg('cliffs', 'start tests', test_cliffs)
-eg('dist', 'distance test', test_dist)
-eg('half', 'divide data in half', test_half)
-eg('tree', 'make snd show tree of clusters', test_tree)
-eg('sway', 'optimizing', test_sway)
-eg('bins', 'find deltas between best and rest', test_bins)
+#eg('the','show options', disp_setting)
+#eg('rand', 'demo random number generation', test_rand)
+#eg("some","demo of reservoir sampling", test_some)
+#eg('nums', 'demo of NUM', test_num)
+#eg('sym', 'demo SYMS', test_sym)
+#eg('csv', 'reading csv files', test_csv)
+#eg('data', 'showing DATA sets', test_data)
+#eg('clone', 'replicate structure of a DATA', test_clone)
+#eg('cliffs', 'start tests', test_cliffs)
+#eg('dist', 'distance test', test_dist)
+#eg('half', 'divide data in half', test_half)
+#eg('tree', 'make snd show tree of clusters', test_tree)
+#eg('sway', 'optimizing', test_sway)
+#eg('bins', 'find deltas between best and rest', test_bins)
 eg("xpln","explore explanation sets", test_xpln)
 
 main(egs)
