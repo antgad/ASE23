@@ -58,7 +58,6 @@ def rnd(n,nPlaces=2):
 
 def cosine(a,b,c):
     c = 1e-5 if c==0 else c
-    # print(c)
     x1 = (a**2 + c**2 - b**2)/(2*c)
     x2 = max(0, min(1, x1))
     y = (abs(a**2 - x2**2))**0.5
@@ -167,7 +166,6 @@ def dofile(filename = 'auto.csv'):
                 text = [line[line.find('{'):]]
                 text += f.readlines()
             line = f.readline()
-    # print(f'local _ = {replace_underscore}')
     for i, line in enumerate(text):
         line = line.strip().replace('=', ':').replace("'", '"').replace("_", replace_underscore)
         if len(line.split(':'))>1:
@@ -178,13 +176,11 @@ def dofile(filename = 'auto.csv'):
     pattern = re.compile("[{][a-zA-Z\d,\"\s\-]+[}]")
     res_match = re.finditer(pattern, text)
     while re.search(pattern, text):
-        # print("while...")
         for l in res_match:
             text = text[:l.start()] + '[' + l.group(0)[1:-1] + ']' + text[l.end():]
         pattern = re.compile("[{]{1}[a-zA-Z\d,\"\[\]\s\-]+[}]{1}")
         res_match = re.finditer(pattern, text)
-        # print("Next while")
-    # print(text)
+
     return json.loads(text)
 
 def cliffsDelta(ns1,ns2,Seed=937162211):
@@ -382,7 +378,6 @@ def firstN(sortedRanges,scoreFun):
     for n in range(1, len(sortedRanges)+1):
         slice = sortedRanges[0:n]
         slice_range = [x['range'] for x in slice]
-
         temp, rule = scoreFun(slice_range)
         if temp and temp>most:
             out, most = rule, temp

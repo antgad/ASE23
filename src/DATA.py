@@ -83,7 +83,6 @@ class DATA:
             A=above
         else:
             A=utils.any(some, self.config['seed'])
-        print(int(self.config['Far'] * len(rows))//1, len(some))
         temp=self.around(A,some)
         B = temp[int(self.config['Far'] * (len(temp) -1 ))//1]['row']
         c = temp[int(self.config['Far'] * (len(temp) -1 ))//1]['dist']#dist(A,B)
@@ -133,7 +132,6 @@ class DATA:
                 return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
                 l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above)
-                #print(l,r,A,B,C)
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:
@@ -170,7 +168,6 @@ class DATA:
         for r in ranges:
             t[r['txt']] = t.get(r['txt']) or []
             t[r['txt']].append({'lo':r['lo'],'hi':r['hi'],'at':r['at']})
-        print(t)
         return self.prune(t,max_size)
     
     def xpln(self,best,rest):
@@ -182,12 +179,12 @@ class DATA:
             rule = self.Rule(ranges,max_size)
 
             if rule:
-                print(utils.showRule(rule))
+                utils.oo(utils.showRule(rule))
                 bestr = utils.selects(rule, best.rows)
                 restr = utils.selects(rule, rest.rows)
                 if len(bestr) + len(restr) >0:
                     return v({'best':len(bestr), 'rest': len(restr)}) , rule
-                return None,None
+            return None,None
         for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
             max_size[ranges[0]['txt']] = len(ranges)
             print("")

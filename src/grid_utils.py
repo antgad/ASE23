@@ -42,17 +42,13 @@ def repRows(t, rows):
         rows[0][j] = rows[0][j] + ":" + s
     rows.pop(-1) # rows[-1]=None (remove last row)
     for n, row in enumerate(rows):
-        # print(n, row)
-        # print(f'Fetch {(len(t["rows"]) - n)} out of 0:{len(t["rows"])-1}' )
+       
         if n==0:
             row.append("thingX")
         else:
             u = t['rows'][len(t['rows']) - n ]
             row.append(u[-1])
-        # print('Rows:')
-        # print(rows)
-        # print("Lengths:", [len(i) for i in rows])
-    # print(rows)
+        
     return DATA(rows)
 
 def transpose(t):

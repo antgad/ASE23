@@ -208,6 +208,7 @@ def test_tree():
 
 
 def test_sway():
+    print("{+++++++++++++SWAY++++++++++++++++++}")
     data = DATA(options['file'])
     best,rest,_ = data.sway()
     print("\nall ", data.stats(data.cols.y, 2, what="mid"))
@@ -218,7 +219,7 @@ def test_sway():
     print("", rest.stats(rest.cols.y, 2, what="div"))
 
 def test_bins():
-    print("\n\nin bins")
+    print("{+++++++++++++BINS++++++++++++++++++}")
     b4 = None
     data = DATA(options['file'])
     best,rest,_ = data.sway()
@@ -233,10 +234,11 @@ def test_bins():
             range['y'].has)
 
 def test_xpln():
-    
+    print("{+++++++++++++XPLN++++++++++++++++++}")
     data = DATA(options['file'])
     best,rest, evals = data.sway()
     rule,most= data.xpln(best,rest)
+    print("{+++++++++++++XPLN++++++++++++++++++}")
     if rule:
         print("\n-----------\nexplain =", o(showRule(rule)))
         selects = utils.selects(rule,data.rows)
@@ -262,7 +264,7 @@ def test_xpln():
 #eg('dist', 'distance test', test_dist)
 #eg('half', 'divide data in half', test_half)
 #eg('tree', 'make snd show tree of clusters', test_tree)
-eg('sway', 'optimizing', test_sway)
+#eg('sway', 'optimizing', test_sway)
 #eg('bins', 'find deltas between best and rest', test_bins)
 eg("xpln","explore explanation sets", test_xpln)
 
