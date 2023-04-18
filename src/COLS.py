@@ -16,6 +16,7 @@ class COLS:
         self.klass = None    
 
         for n, s in enumerate(t):
+            
             col =  NUM(n, s) if re.search("^[A-Z]+",s) else SYM(n, s)
             self.all.append(col)
 
@@ -24,7 +25,7 @@ class COLS:
                     self.klass = col
                 if re.findall(r"[!+-]$", s):
                     self.y.append(col)
-                else:   
+                else:  
                     self.x.append(col)
 
     def add(self, row):

@@ -7,6 +7,7 @@ from utils import *
 import utils
 from grid_utils import *
 import json
+import pandas as pd
 options=OPTIONS.OPTIONS()
 help="""
 xpln: multi-goal semi-supervised explanation
@@ -39,6 +40,15 @@ def main(funs,saved={},fails=0):
     file_num = int(input("Enter file_num:"))
     file_list = ["auto2.csv", "auto93.csv", "china.csv", "coc1000.csv", "coc10000.csv", "healthCloseIsses12mths0001-hard.csv", "healthCloseIsses12mths0011-easy.csv", "nasa93dem.csv", "pom.csv", "SSM.csv", "SSN.csv"] 
     options['file'] = "../etc/project_data/" + file_list[file_num]
+    df=pd.read_csv(options['file'],na_values='?')
+    df.columns = df.columns.str.strip()
+    for col in df.columns:
+        if df[col].dtype.kind in 'biufc':
+            temp=int(df[col].mean())
+            df[col].fillna(temp,inplace=True)
+    options['file']=options['file'][:-4]+"_updated.csv"
+    df.to_csv(options['file'],index=False)
+    print("saved")
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:

@@ -16,6 +16,7 @@ class DATA:
         self.config={}
         with open('config.json') as json_file:
             self.config = json.load(json_file)
+        print(self.config['file'])
         def fun(x): 
             self.add(x)
         if type(src)==str:
@@ -51,8 +52,6 @@ class DATA:
         s1,s2=0,0
         ys=self.cols.y
         for col in ys:
-            print()
-            print(ys)
             x = col.norm(row1.cells[col.at])
             y = col.norm(row2.cells[col.at])
             s1 -= math.exp(col.w * (x-y)/len(ys))
