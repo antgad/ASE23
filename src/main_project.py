@@ -55,8 +55,64 @@ def main(funs,saved={},fails=0):
         saved[k]=v
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
+    birth=time.time()
+    best1=[]
+    best2=[]
+    times1=[]
+    times2=[]
+    data = DATA(options['file'])
+    for i in range(20):
+        print(f"\n\n++++++++++++++++++++++++++++Iter {i}+++++++++++++++++++++++++++++")
     
-    if options['help']:
+        start_time = time.time()
+        print("++++++++++++++++++++++++++++++SWAY1++++++++++++++++++++++++++++++")
+        
+        best,rest, evals = data.sway()
+        best1.append(best)
+        end_time = time.time()
+        runtime = end_time - start_time
+        times1.append(runtime)
+    
+    saved['Type']=1
+    
+    with open("config.json", "w") as outfile:
+        json.dump(saved, outfile)
+    data2 = DATA(options['file'])
+    for i in range(20):
+        print(f"\n\n++++++++++++++++++++++++++++Iter {i}+++++++++++++++++++++++++++++")
+    
+        start_time = time.time()
+        print("++++++++++++++++++++++++++++++SWAY2++++++++++++++++++++++++++++++")
+        best,rest, evals = data2.sway()
+        best2.append(best)
+        
+        '''rule,most= data.xpln(best,rest)
+        print("++++++++++++++++++++++++++++++XPLN++++++++++++++++++++++++++++++")
+        if rule and rule!=-1:
+            print("\n-----------\nexplain =", o(showRule(rule)))
+            selects = utils.selects(rule,data.rows)
+            data_selects = [s for s in selects if s!=None]
+            data1 = data.clone(data_selects)
+            print('all               ',o(data.stats(data.cols.y,2,what='mid')), o(data.stats(data.cols.y,2,what='div')))
+            print('sway with',evals,'evals', o(best.stats(best.cols.y,2,what='mid'), o(best.stats(best.cols.y,2,what='div'))))
+            print('xpln on',evals,'evals', o(data1.stats(data1.cols.y,2,what='mid'), o(data1.stats(data1.cols.y,2,what='div'))))
+            top,_ = data.betters(len(best.rows))
+            top = data.clone(top)
+            print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
+        else:
+            print("No Rules Found :( Try Again)")'''
+        end_time = time.time()
+        runtime = end_time - start_time
+        times2.append(runtime)
+        print(f"Algo Runtime: {runtime} seconds")
+    stats_out=utils.stats(data,best1,best2)
+    print('++++++++++++++++++++++++++++++STATS++++++++++++++++++++++++++++++')
+
+    print(stats_out)
+
+
+
+    '''if options['help']:
         print(help)
     else:
         for what,fun in funs.items():
@@ -68,11 +124,12 @@ def main(funs,saved={},fails=0):
                     fails = fails + 1
                     print("❌ fail:", what)
                 else:
-                    print("✅ pass:", what)
-    end_time = time.time()
-    runtime = end_time - start_time
+                    print("✅ pass:", what)'''
+        
 
-    print(f"Runtime: {runtime} seconds")
+    
+
+    
     os.remove('config.json')
     exit(fails)
 
@@ -211,52 +268,7 @@ def test_tree():
     data = DATA(options['file'])
     showTree(data.tree(),cols=data.cols.y, nPlaces=1, what="mid")
 
-
-def test_sway():
-    print("{+++++++++++++SWAY++++++++++++++++++}")
-    data = DATA(options['file'])
-    best,rest,_ = data.sway()
-    print("\nall ", data.stats(data.cols.y, 2, what="mid"))
-    print("", data.stats(data.cols.y, 2, what="div"))
-    print("\nbest",best.stats(best.cols.y, 2, what="mid"))
-    print("", best.stats(best.cols.y, 2, what="div"))
-    print("\nrest", rest.stats(rest.cols.y, 2, what="mid"))
-    print("", rest.stats(rest.cols.y, 2, what="div"))
-
-def test_bins():
-    print("{+++++++++++++BINS++++++++++++++++++}")
-    b4 = None
-    data = DATA(options['file'])
-    best,rest,_ = data.sway()
-    print("all","","","",{'best':len(best.rows), 'rest':len(rest.rows)})
-    for k,t in enumerate(bins(data.cols.x,{'best':best.rows, 'rest':rest.rows})):
-        for range in t:
-            if range['txt'] != b4:
-                print("")
-            b4 = range['txt']
-            print(range['txt'],range['lo'],range['hi'],
-            rnd(value(range['y'].has, len(best.rows),len(rest.rows),"best")), 
-            range['y'].has)
-
-def test_xpln():
-    print("{+++++++++++++XPLN++++++++++++++++++}")
-    data = DATA(options['file'])
-    best,rest, evals = data.sway()
-    rule,most= data.xpln(best,rest)
-    print("{+++++++++++++XPLN++++++++++++++++++}")
-    if rule and rule!=-1:
-        print("\n-----------\nexplain =", o(showRule(rule)))
-        selects = utils.selects(rule,data.rows)
-        data_selects = [s for s in selects if s!=None]
-        data1 = data.clone(data_selects)
-        print('all               ',o(data.stats(data.cols.y,2,what='mid')), o(data.stats(data.cols.y,2,what='div')))
-        print('sway with',evals,'evals', o(best.stats(best.cols.y,2,what='mid'), o(best.stats(best.cols.y,2,what='div'))))
-        print('xpln on',evals,'evals', o(data1.stats(data1.cols.y,2,what='mid'), o(data1.stats(data1.cols.y,2,what='div'))))
-        top,_ = data.betters(len(best.rows))
-        top = data.clone(top)
-        print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
-    else:
-        print("No Rules Found :( Try Again)")
+#
 
 
 #eg('the','show options', disp_setting)
@@ -273,7 +285,7 @@ def test_xpln():
 #eg('tree', 'make snd show tree of clusters', test_tree)
 #eg('sway', 'optimizing', test_sway)
 #eg('bins', 'find deltas between best and rest', test_bins)
-eg("xpln","explore explanation sets", test_xpln)
+#eg("xpln","explore explanation sets", test_xpln)
 
 main(egs)
 

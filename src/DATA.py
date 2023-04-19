@@ -45,7 +45,9 @@ class DATA:
         cols = cols if cols else self.cols.y
         def fun(_, col ):
             return col.rnd(getattr(col,what)(),nPlaces), col.txt
-        return utils.kap(cols,fun)
+        tmp=utils.kap(cols,fun)
+        tmp['N']=len(self.rows)
+        return tmp
     
     def better(self,row1,row2):
         s1,s2=0,0
@@ -135,6 +137,7 @@ class DATA:
         return node
         
     def sway(self,rows=None, min=None, cols=None, above=None,type=0):
+        print("Type:"+str(self.config['Type']))
         data = self
         def worker(rows, worse, evals0=None, above=None):
             if len(rows) <= len(data.rows)**self.config['min']:
@@ -196,9 +199,8 @@ class DATA:
             return None,None
         for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
             max_size[ranges[0]['txt']] = len(ranges)
-            print("")
+            
             for r in ranges:
-                print(r['txt'], r['lo'], r['hi'])
                 val = v(r['y'].has)
                 temp.append({'range': r, 'max': len(ranges), 'val': val})
         rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)        
@@ -206,6 +208,8 @@ class DATA:
     def betters(self,n):
         sorted_rows = list(sorted(self.rows, key=functools.cmp_to_key(self.better)))
         return n and sorted_rows[:n], sorted_rows[n+1:] or sorted_rows
+    
+    
 
 
 
