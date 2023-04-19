@@ -5,7 +5,6 @@ import math
 import functools
 import json
 import random
-from sklearn.tree import DecisionTreeClassifier
 
 class DATA:
     """
@@ -197,46 +196,13 @@ class DATA:
             return None,None
         for ranges in utils.bins(self.cols.x,{'best':best.rows, 'rest':rest.rows}):
             max_size[ranges[0]['txt']] = len(ranges)
-            
+            print("")
             for r in ranges:
+                print(r['txt'], r['lo'], r['hi'])
                 val = v(r['y'].has)
                 temp.append({'range': r, 'max': len(ranges), 'val': val})
         rule, most = utils.firstN(sorted(temp,key = lambda k: k['val'], reverse = True), score)        
         return rule, most
-    
-    def xpln2(self, best,rest):
-        xBest=[]
-        yBest=[]
-        xRest=[]
-        yRest=[]
-        xTest=[]
-
-        for row in best.rows:
-            xBest.append([row.cells[col.at] for col in best.cols.x])
-            yBest.append("BEST")
-        for row in rest.rows:
-            xRest.append([row.cells[col.at] for col in rest.cols.x])
-            yRest.append("REST")
-        for row in self.rows:
-            xTest.append([row.cells[col.at] for col in self.cols.x])
-        xTrain = xBest+xRest
-        yTrain = yBest+yRest
-        dtc=DecisionTreeClassifier(random_stat=self.config['seed'])
-        dtc.fit(xTrain,yTrain)
-        bestPred=[]
-        restPred=[]
-        for indx,row in enumerate(xTest):
-            if dtc.predict(row) =="BEST":
-                bestPred.append(self.rows[indx])
-            else:
-                restPred.append(self.rows[indx])
-        return bestPred,restPred
-
-
-
-
-
-        pass
     def betters(self,n):
         sorted_rows = list(sorted(self.rows, key=functools.cmp_to_key(self.better)))
         return n and sorted_rows[:n], sorted_rows[n+1:] or sorted_rows
