@@ -59,10 +59,18 @@ class DATA:
 
     def dist(self, row1,row2,cols=None):
         n,d=0,0
-        for col in cols or self.cols.x:
-            n += 1
-            d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.config['p'])
-        return math.pow((d/n),(1/self.config['p']))
+        if self.config['Type']==0:
+            for col in cols or self.cols.x:
+               
+                n += 1
+                d += math.pow(col.dist(row1.cells[col.at],row2.cells[col.at]),self.config['p'])
+            return math.pow((d/n),(1/self.config['p']))
+        else:
+           
+            for col in cols or self.cols.x:
+                n += 1
+                d += col.dist(row1.cells[col.at],row2.cells[col.at])
+            return d/(n+d)
 
     def around(self,row1,rows=None,cols=None):
         rows = rows if rows else self.rows
@@ -72,7 +80,7 @@ class DATA:
         return sorted(list(map(function,rows or self.rows)),key=lambda k: k['dist'])
 
 
-    def half(self,rows=None,cols=None,above=None):
+    def half(self,rows=None,cols=None,above=None,type=0):
         def dist(row1,row2):
             return self.dist(row1,row2,cols)
         
@@ -97,10 +105,11 @@ class DATA:
                 row.__setattr__('y', y)
             row.x = row.x if row.x else x
             row.y = row.y if row.y else y'''
-            return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c)}
+            return {'row':row, 'dist': utils.cosine(dist(row,A), dist(row,B), c,type=type)}
         
         mid=None
         evals = 0
+        
         for n,temp in enumerate(sorted((map(project,rows)),key = lambda k:k['dist'])):
             if n+1 <= len(rows)//2:
                 left.append(temp["row"])
@@ -125,13 +134,13 @@ class DATA:
             node['right']= self.cluster(rows=right, min=min, cols=cols, above=node['B'])
         return node
         
-    def sway(self,rows=None, min=None, cols=None, above=None):
+    def sway(self,rows=None, min=None, cols=None, above=None,type=0):
         data = self
         def worker(rows, worse, evals0=None, above=None):
             if len(rows) <= len(data.rows)**self.config['min']:
                 return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
-                l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above)
+                l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above,type=type)
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:

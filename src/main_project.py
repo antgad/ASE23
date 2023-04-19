@@ -7,6 +7,7 @@ from utils import *
 import utils
 from grid_utils import *
 import json
+import time
 import pandas as pd
 options=OPTIONS.OPTIONS()
 help="""
@@ -29,6 +30,7 @@ OPTIONS:
   -r  --rest    how many of rest to sample   = 10
   -R  --Reuse   child splits reuse a parent pole = true
   -s  --seed    random number seed           = 937162211
+  -t  --Type   Distance Type(Eucledian/Jaccard) = 0
 
 ACTIONS:
 """
@@ -38,6 +40,7 @@ ACTIONS:
 def main(funs,saved={},fails=0):
     options.cli_setting(help)
     file_num = int(input("Enter file_num:"))
+    start_time = time.time()
     file_list = ["auto2.csv", "auto93.csv", "china.csv", "coc1000.csv", "coc10000.csv", "healthCloseIsses12mths0001-hard.csv", "healthCloseIsses12mths0011-easy.csv", "nasa93dem.csv", "pom.csv", "SSM.csv", "SSN.csv"] 
     options['file'] = "../etc/project_data/" + file_list[file_num]
     df=pd.read_csv(options['file'],na_values='?')
@@ -48,7 +51,6 @@ def main(funs,saved={},fails=0):
             df[col].fillna(temp,inplace=True)
     options['file']=options['file'][:-4]+"_updated.csv"
     df.to_csv(options['file'],index=False)
-    print("saved")
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:
@@ -67,7 +69,10 @@ def main(funs,saved={},fails=0):
                     print("❌ fail:", what)
                 else:
                     print("✅ pass:", what)
+    end_time = time.time()
+    runtime = end_time - start_time
 
+    print(f"Runtime: {runtime} seconds")
     os.remove('config.json')
     exit(fails)
 
