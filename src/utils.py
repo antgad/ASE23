@@ -336,12 +336,12 @@ def selects(rule, rows):
             lo,hi,at = range['lo'], range['hi'], range['at']
             x = row.cells[at]
             if (x == '?') or (lo == hi == x) or (lo <= x and x < hi):
-                return True
-        return False
+                return False
+        return True
 
     def conjunction(row):
         for ranges in rule.values():
-            if not disjunction(ranges, row):
+            if  disjunction(ranges, row):
                 return False
         return True
     def fun(r):
