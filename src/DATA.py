@@ -35,6 +35,13 @@ class DATA:
         else:
             self.cols = COLS(t)
     
+    def subset(self,rows):
+        dataSubset = DATA([self.cols.names])
+        for row in rows:
+            if row != None:
+                dataSubset.add(row)
+        return dataSubset
+
 
     def clone(self, init={}):
         data = DATA([self.cols.names])
@@ -192,7 +199,7 @@ class DATA:
             rule = self.Rule(ranges,max_size)
 
             if rule:
-                utils.oo(utils.showRule(rule))
+               # utils.oo(utils.showRule(rule))
                 bestr = utils.selects(rule, best.rows)
                 restr = utils.selects(rule, rest.rows)
                 if len(bestr) + len(restr) >0:
@@ -227,12 +234,12 @@ class DATA:
             xTest.append([row.cells[col.at] for col in self.cols.x])
         xTrain = xBest+xRest
         yTrain = yBest+yRest
-        dtc=DecisionTreeClassifier(random_stat=self.config['seed'])
+        dtc=DecisionTreeClassifier(random_state=self.config['seed'])
         dtc.fit(xTrain,yTrain)
         bestPred=[]
         restPred=[]
         for indx,row in enumerate(xTest):
-            if dtc.predict(row) =="BEST":
+            if dtc.predict([row]) =="BEST":
                 bestPred.append(self.rows[indx])
             else:
                 restPred.append(self.rows[indx])
