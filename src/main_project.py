@@ -79,8 +79,6 @@ def main(funs,saved={},fails=0):
     data = DATA(options['file'])
     for i in range(20):
         iterator.append(i)
-        print(f"\n\n++++++++++++++++++++++++++++Iter {i}+++++++++++++++++++++++++++++")
-    
         start_time = time.time()
         best,rest, evals = data.sway()
         best1.append(best)
@@ -96,7 +94,6 @@ def main(funs,saved={},fails=0):
         json.dump(saved, outfile)
     data2 = DATA(options['file'])
     for i in range(20):
-        print(f"\n\n++++++++++++++++++++++++++++Iter {i}+++++++++++++++++++++++++++++")
     
         start_time = time.time()
         best,rest, evals = data2.sway()
@@ -106,7 +103,6 @@ def main(funs,saved={},fails=0):
         end_time = time.time()
         runtime = end_time - start_time
         times2.append(runtime)
-        print(f"Algo Runtime: {runtime} seconds")
     sways,xplns,bestValXpln1,bestValXpln2,bestValSway1,bestValSway2=utils.stats(data,best1,best2,xpln1,xpln2)
     print('++++++++++++++++++++++++++++++STATS++++++++++++++++++++++++++++++')
 

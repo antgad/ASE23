@@ -431,7 +431,6 @@ def stats(data,best1,best2,xpln1,xpln2):
         for i in range(nbr_sway):
             for j in range(i+1,nbr_sway):
                 _, p = kruskal(cols[0],cols[1])
-                
                 kwPVal[i, j] = p
         df = pd.DataFrame(kwPVal, index=algos, columns=algos)
         sig = set(df.iloc[list(np.where(df >= sigLvl)[0])].index)
@@ -440,6 +439,7 @@ def stats(data,best1,best2,xpln1,xpln2):
             sways.append([bestSway])
         else:
             sways.append(list(sig))
+    print(kwPVal)
     nbr_xpln=2
     for col in data.cols.y:
         avgs=[avg(xpln1)[col.txt],avg(xpln2)[col.txt]]
@@ -470,6 +470,7 @@ def stats(data,best1,best2,xpln1,xpln2):
             xplns.append([bestXpln])
         else:
             xplns.append(list(sig))
+    print(kwPVal)
     return sways,xplns,bestValXpln1,bestValXpln2,bestValSway1,bestValSway2
     
     pass

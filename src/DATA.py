@@ -5,7 +5,9 @@ import math
 import functools
 import json
 import random
+import numpy as np
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.cluster import KMeans
 
 class DATA:
     """
@@ -145,13 +147,16 @@ class DATA:
         return node
         
     def sway(self,rows=None, min=None, cols=None, above=None,type=0):
-        print("Type:"+str(self.config['Type']))
+        
         data = self
         def worker(rows, worse, evals0=None, above=None):
             if len(rows) <= len(data.rows)**self.config['min']:
                 return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
-                l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above,type=type)
+                if self.config['Type']==0:
+                    l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above,type=type)
+                else:
+                    l,r,A,B, evals = self.kmean_sway(rows=rows)
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:
@@ -245,7 +250,33 @@ class DATA:
                 restPred.append(self.rows[indx])
         return bestPred,restPred
     
-    
+    def kmean_sway(self,rows=None):
+        left=[]
+        right=[]
+        A=None
+        B=None
+        def minDist(c,row,A):
+            if not A:
+                A=row
+            if self.dist(A,c)>self.dist(A,row):
+                return row
+            else:
+                return A
+        if not rows:
+            rows=self.rows
+        row_list = np.array([row.cells for row in rows])
+        km=KMeans(n_clusters=2,random_state=self.config['seed'],n_init=10)
+        km.fit(row_list)
+        leftCluster = ROW(km.cluster_centers_[0])
+        rightCluster = ROW(km.cluster_centers_[1])
+        for key, value in enumerate(km.labels_):
+            if value == 0:
+                A = minDist(leftCluster, rows[key], A)
+                left.append(rows[key])
+            else:
+                B = minDist(rightCluster, rows[key], B)
+                right.append(rows[key])
+        return left, right, A, B, 1
 
 
 
