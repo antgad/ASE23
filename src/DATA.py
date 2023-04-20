@@ -153,10 +153,9 @@ class DATA:
             if len(rows) <= len(data.rows)**self.config['min']:
                 return rows, utils.many(worse, self.config['rest']*len(rows)), evals0
             else:
-                if self.config['Type']==0:
-                    l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above,type=type)
-                else:
-                    l,r,A,B, evals = self.kmean_sway(rows=rows)
+               
+                l,r,A,B,C,D, evals = self.half(rows=rows, cols=None, above=above,type=type)
+                
                 if self.better(B,A):
                     l,r,A,B = r,l,B,A
                 for row in r:

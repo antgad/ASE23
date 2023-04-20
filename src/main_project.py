@@ -77,7 +77,7 @@ def main(funs,saved={},fails=0):
     times2=[]
     iterator=[]
     data = DATA(options['file'])
-    for i in range(20):
+    for i in range(50):
         iterator.append(i)
         start_time = time.time()
         best,rest, evals = data.sway()
@@ -93,7 +93,7 @@ def main(funs,saved={},fails=0):
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
     data2 = DATA(options['file'])
-    for i in range(20):
+    for i in range(50):
     
         start_time = time.time()
         best,rest, evals = data2.sway()
