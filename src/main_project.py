@@ -42,10 +42,7 @@ ACTIONS:
 #  auto2.csv        china.csv    coc10000.csv   healthCloseIsses12mths0011-easy.csv   pom.csv    SSN.csv
 def main(funs,saved={},fails=0):
     options.cli_setting(help)
-    file_num = int(input("Enter file_num:"))
     start_time = time.time()
-    file_list = ["auto2.csv", "auto93.csv", "china.csv", "coc1000.csv", "coc10000.csv", "healthCloseIsses12mths0001-hard.csv", "healthCloseIsses12mths0011-easy.csv", "nasa93dem.csv", "pom.csv", "SSM.csv", "SSN.csv"] 
-    options['file'] = "../etc/project_data/" + file_list[file_num]
     df=pd.read_csv(options['file'],na_values='?')
     df.columns = df.columns.str.strip()
     le=LabelEncoder()
