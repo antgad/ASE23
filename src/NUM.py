@@ -51,6 +51,15 @@ class NUM:
         return (n-self.lo)/(self.hi-self.lo+pow(10,-32))
 
     def dist(self,n1,n2):
+        
+        if self.config['Type']==1:
+            if n1!=0:
+                if (abs(n1-n2)/n1>0.05):
+                    return 1
+            if n2!=0:
+                if (abs(n1-n2)/n2>0.05):
+                    return 1
+            return 0
         if n1=="?" and n2=="?":
             return 1
         n1,n2= self.norm(n1),self.norm(n2)
@@ -64,4 +73,5 @@ class NUM:
                 n2=1
             else:
                 n2=0
+        
         return abs(n1-n2)

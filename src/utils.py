@@ -2,13 +2,17 @@
 
 import NUM
 import SYM
+import matplotlib.pyplot as plt
 import ROW
 import math
 import re
 import io
 from copy import deepcopy
 import json
+import pandas as pd
 import random
+import numpy as np
+from scipy.stats import kruskal, mannwhitneyu
 config= {}
 
 ## Show
@@ -56,11 +60,12 @@ def rnd(n,nPlaces=2):
     mult = pow(10,nPlaces)
     return math.floor(n*mult+0.5)/mult
 
-def cosine(a,b,c):
+def cosine(a,b,c,type=0):
     c = 1e-5 if c==0 else c
     x1 = (a**2 + c**2 - b**2)/(2*c)
     x2 = max(0, min(1, x1))
     y = (abs(a**2 - x2**2))**0.5
+    
     return x2, y
 
 ## Lists
@@ -216,6 +221,18 @@ def showTree(node, what, cols, nPlaces, lvl = 0):
     show(node.get('right'), what,cols,nPlaces, lvl+1)
 
 def bins(cols,rowss):
+    with open('config.json') as json_file:
+            config = json.load(json_file)
+    binval=config['bins']-1
+    def bin(col,x):
+        
+        if (x=="?") or (isinstance(col, SYM.SYM)):
+            return x
+        tmp = (col.hi - col.lo)/(binval)
+        if col.hi == col.lo:
+            return 1
+        else:
+            return math.floor(x/tmp + .5)*tmp
     out = []
     for col in cols:
         ranges = {}
@@ -232,16 +249,6 @@ def bins(cols,rowss):
         out.append(r)
     return out
 
-def bin(col,x):
-    with open('config.json') as json_file:
-        config = json.load(json_file)
-    if (x=="?") or (isinstance(col, SYM.SYM)):
-        return x
-    tmp = (col.hi - col.lo)/(config['bins']-1)
-    if col.hi == col.lo:
-        return 1
-    else:
-        return math.floor(x/tmp + .5)*tmp
 
 def merge(col1,col2):
   new = deepcopy(col1)
@@ -361,10 +368,8 @@ def diffs(nums1,nums2):
 def firstN(sortedRanges,scoreFun):
     def printRange(r):
         print(r['range']['txt'], r['range']['lo'], r['range']['hi'], rnd(r['val']), dict(r['range']['y'].has))
-    print()
-    list(map( printRange, sortedRanges))
-    first = sortedRanges[0]['val']
-    print()
+    #list(map( printRange, sortedRanges))
+
     first = sortedRanges[0]['val']
     def useful(range):
         if range['val'] > 0.05 and range['val'] > first/10:
@@ -378,6 +383,97 @@ def firstN(sortedRanges,scoreFun):
         if temp and temp>most:
             out, most = rule, temp
     return out, most
+
+def avg(datas):
+    out={}
+    for data in datas:
+        for k,v in data.stats().items():
+            out[k]=out.get(k,0)+v
+    for k,v in out.items():
+        out[k] /= 20
+    return out
+
+
+    pass
+def stats(data,best1,best2,xpln1,xpln2):
+    sigLvl=5
+    nbr_sway=2
+    xplns=[]
+    sways=[]
+    bestValSway1={}
+    bestValSway2={}
+    bestValXpln1={}
+    bestValXpln2={}
+    for col in data.cols.y:
+        avgs=[avg(best1)[col.txt],avg(best2)[col.txt]]
+        if col.w==-1:
+            bestAvg=min(avgs)
+        else:
+            bestAvg=max(avgs)
+        bestSway="sway"+str(avgs.index(bestAvg)+1)
+        bestValSway1[col.txt]=avgs[0]
+        bestValSway2[col.txt]=avgs[1]
+        for best in best1:
+            sway1Col = [row.cells[col.at] for row in best.rows]
+        for best in best2:
+            sway2Col = [row.cells[col.at] for row in best.rows]
+        plt.plot(range(len(sway1Col)), sway1Col, label='Sway1')
+        plt.plot(range(len(sway2Col)), sway2Col, label='Sway2')
+        plt.xlabel(col.txt)
+        plt.ylabel('Value')
+        plt.title('Values for various iterations')
+        plt.legend()
+        plt.show()
+        cols=[sway1Col,sway2Col]
+        algos=['sway1','sway2']
+        mwuPVal=np.zeros((nbr_sway,nbr_sway))
+        kwPVal=np.zeros((nbr_sway,nbr_sway))
+        for i in range(nbr_sway):
+            for j in range(i+1,nbr_sway):
+                _, p = kruskal(cols[0],cols[1])
+                kwPVal[i, j] = p
+        df = pd.DataFrame(kwPVal, index=algos, columns=algos)
+        sig = set(df.iloc[list(np.where(df >= sigLvl)[0])].index)
+        
+        if len(sig) == 0:
+            sways.append([bestSway])
+        else:
+            sways.append(list(sig))
+    print(kwPVal)
+    nbr_xpln=2
+    for col in data.cols.y:
+        avgs=[avg(xpln1)[col.txt],avg(xpln2)[col.txt]]
+        if col.w==-1:
+            bestAvg=min(avgs)
+        else:
+            bestAvg=max(avgs)
+        bestXpln="Xpln"+str(avgs.index(bestAvg)+1)
+        bestValXpln1[col.txt]=avgs[0]
+        bestValXpln2[col.txt]=avgs[1]
+        for best in xpln1:
+            xpln1Col = [row.cells[col.at] for row in best.rows]
+        for best in xpln2:
+            xpln2Col = [row.cells[col.at] for row in best.rows]
+        cols=[xpln1Col,xpln2Col]
+        algos=['xpln1','xpln2']
+        mwuPVal=np.zeros((nbr_xpln,nbr_xpln))
+        kwPVal=np.zeros((nbr_xpln,nbr_xpln))
+        for i in range(nbr_xpln):
+            for j in range(i+1,nbr_xpln):
+                _, p = kruskal(cols[0],cols[1])
+                
+                kwPVal[i, j] = p
+        df = pd.DataFrame(kwPVal, index=algos, columns=algos)
+        sig = set(df.iloc[list(np.where(df >= sigLvl)[0])].index)
+        
+        if len(sig) == 0:
+            xplns.append([bestXpln])
+        else:
+            xplns.append(list(sig))
+    print(kwPVal)
+    return sways,xplns,bestValXpln1,bestValXpln2,bestValSway1,bestValSway2
+    
+    pass
 
 
 

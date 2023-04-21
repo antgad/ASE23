@@ -7,8 +7,12 @@ from utils import *
 import utils
 from grid_utils import *
 import json
+import time
 import pandas as pd
 options=OPTIONS.OPTIONS()
+import statistics
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
 help="""
 xpln: multi-goal semi-supervised explanation
 (c)2023
@@ -18,7 +22,7 @@ OPTIONS:
   -b  --bins    initial number of bins       = 16
   -c  --cliffs  cliff's delta threshold      = .147
   -d  --d       different is over sd*d       = .35
-  -f  --file    data file                    = ../etc/project_data/china.csv
+  -f  --file    data file                    = ../etc/project_data/auto93.csv
   -F  --Far     distance to distant          = .95
   -g  --go      start-up action              = nothing
   -h  --help    show help                    = false
@@ -29,6 +33,7 @@ OPTIONS:
   -r  --rest    how many of rest to sample   = 10
   -R  --Reuse   child splits reuse a parent pole = true
   -s  --seed    random number seed           = 937162211
+  -t  --Type   Distance Type(Eucledian/Jaccard) = 0
 
 ACTIONS:
 """
@@ -37,24 +42,90 @@ ACTIONS:
 #  auto2.csv        china.csv    coc10000.csv   healthCloseIsses12mths0011-easy.csv   pom.csv    SSN.csv
 def main(funs,saved={},fails=0):
     options.cli_setting(help)
-    file_num = int(input("Enter file_num:"))
-    file_list = ["auto2.csv", "auto93.csv", "china.csv", "coc1000.csv", "coc10000.csv", "healthCloseIsses12mths0001-hard.csv", "healthCloseIsses12mths0011-easy.csv", "nasa93dem.csv", "pom.csv", "SSM.csv", "SSN.csv"] 
-    options['file'] = "../etc/project_data/" + file_list[file_num]
+    start_time = time.time()
     df=pd.read_csv(options['file'],na_values='?')
     df.columns = df.columns.str.strip()
+    le=LabelEncoder()
     for col in df.columns:
         if df[col].dtype.kind in 'biufc':
             temp=int(df[col].mean())
             df[col].fillna(temp,inplace=True)
+        
+        if df[col].dtype=='object'and col[0].islower():
+            tmp=le.fit_transform(df[col])
+            df[col]=tmp.copy()
+            print("Label Encoding Applied to "+col)
+            label_mapping = dict(zip(le.classes_, le.transform(le.classes_)))
+            print(label_mapping)#json.dumps(label_mapping, indent=4))
+
+
     options['file']=options['file'][:-4]+"_updated.csv"
     df.to_csv(options['file'],index=False)
-    print("saved")
     for k,v in options.items():
         saved[k]=v
     with open("config.json", "w") as outfile:
         json.dump(saved, outfile)
+    birth=time.time()
+    best1=[]
+    best2=[]
+    xpln1=[]
+    xpln2=[]
+    times1=[]
+    times2=[]
+    iterator=[]
+    data = DATA(options['file'])
+    for i in range(50):
+        iterator.append(i)
+        start_time = time.time()
+        best,rest, evals = data.sway()
+        best1.append(best)
+        rule,most=data.xpln(best,rest)
+        xpln1.append((data.subset(utils.selects(rule,data.rows))))
+        end_time = time.time()
+        runtime = end_time - start_time
+        times1.append(runtime)
     
-    if options['help']:
+    saved['Type']=1
+    
+    with open("config.json", "w") as outfile:
+        json.dump(saved, outfile)
+    data2 = DATA(options['file'])
+    for i in range(50):
+    
+        start_time = time.time()
+        best,rest, evals = data2.sway()
+        best2.append(best)
+        bextXpln,restXpln=data.xpln2(best,rest)
+        xpln2.append((data.subset(bextXpln)))
+        end_time = time.time()
+        runtime = end_time - start_time
+        times2.append(runtime)
+    sways,xplns,bestValXpln1,bestValXpln2,bestValSway1,bestValSway2=utils.stats(data,best1,best2,xpln1,xpln2)
+    print('++++++++++++++++++++++++++++++STATS++++++++++++++++++++++++++++++')
+
+    
+    print("Avg Runtime 1: "+str(statistics.mean(times1)))
+    print("Avg Runtime 2: "+str(statistics.mean(times2)))
+    print('all',o(data.stats(data.cols.y,2,what='mid')))
+    print("Sway1: "+ str(bestValSway1))
+    print("Sway2: "+ str(bestValSway2))
+    print("Xpln1: "+ str(bestValXpln1))
+    print("Xpln2: "+ str(bestValXpln2))
+    top,_ = data.betters(len(best.rows))
+    top = data.clone(top)
+    print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')))
+    plt.plot(range(len(times1)), times1, label='Sway1/Xpln1')
+    plt.plot(range(len(times2)), times2, label='Sway2/Xpln2')
+    plt.xlabel('Iteration')
+    plt.ylabel('Runtime')
+    plt.title('Runtime of iterations')
+    plt.legend()
+    plt.show()
+    
+
+
+
+    '''if options['help']:
         print(help)
     else:
         for what,fun in funs.items():
@@ -66,8 +137,12 @@ def main(funs,saved={},fails=0):
                     fails = fails + 1
                     print("❌ fail:", what)
                 else:
-                    print("✅ pass:", what)
+                    print("✅ pass:", what)'''
+        
 
+    
+
+    
     os.remove('config.json')
     exit(fails)
 
@@ -81,7 +156,6 @@ def eg(key,s,fun):
 def disp_setting():
     oo(options)
     return str(options)
-
 
 def test_sym():
     sym = SYM.SYM()
@@ -152,7 +226,6 @@ def test_data():
     print(col.lo, col.hi, col.mid(), col.div(), col)
     print(o(data.stats(data.cols.y, 2, what="mid")))
     
-
 def test_clone():
     data1 = DATA(options['file'])
     data2 = data1.clone(data1.rows)
@@ -206,52 +279,7 @@ def test_tree():
     data = DATA(options['file'])
     showTree(data.tree(),cols=data.cols.y, nPlaces=1, what="mid")
 
-
-def test_sway():
-    print("{+++++++++++++SWAY++++++++++++++++++}")
-    data = DATA(options['file'])
-    best,rest,_ = data.sway()
-    print("\nall ", data.stats(data.cols.y, 2, what="mid"))
-    print("", data.stats(data.cols.y, 2, what="div"))
-    print("\nbest",best.stats(best.cols.y, 2, what="mid"))
-    print("", best.stats(best.cols.y, 2, what="div"))
-    print("\nrest", rest.stats(rest.cols.y, 2, what="mid"))
-    print("", rest.stats(rest.cols.y, 2, what="div"))
-
-def test_bins():
-    print("{+++++++++++++BINS++++++++++++++++++}")
-    b4 = None
-    data = DATA(options['file'])
-    best,rest,_ = data.sway()
-    print("all","","","",{'best':len(best.rows), 'rest':len(rest.rows)})
-    for k,t in enumerate(bins(data.cols.x,{'best':best.rows, 'rest':rest.rows})):
-        for range in t:
-            if range['txt'] != b4:
-                print("")
-            b4 = range['txt']
-            print(range['txt'],range['lo'],range['hi'],
-            rnd(value(range['y'].has, len(best.rows),len(rest.rows),"best")), 
-            range['y'].has)
-
-def test_xpln():
-    print("{+++++++++++++XPLN++++++++++++++++++}")
-    data = DATA(options['file'])
-    best,rest, evals = data.sway()
-    rule,most= data.xpln(best,rest)
-    print("{+++++++++++++XPLN++++++++++++++++++}")
-    if rule and rule!=-1:
-        print("\n-----------\nexplain =", o(showRule(rule)))
-        selects = utils.selects(rule,data.rows)
-        data_selects = [s for s in selects if s!=None]
-        data1 = data.clone(data_selects)
-        print('all               ',o(data.stats(data.cols.y,2,what='mid')), o(data.stats(data.cols.y,2,what='div')))
-        print('sway with',evals,'evals', o(best.stats(best.cols.y,2,what='mid'), o(best.stats(best.cols.y,2,what='div'))))
-        print('xpln on',evals,'evals', o(data1.stats(data1.cols.y,2,what='mid'), o(data1.stats(data1.cols.y,2,what='div'))))
-        top,_ = data.betters(len(best.rows))
-        top = data.clone(top)
-        print('sort with', len(data.rows), 'evals', o(top.stats(top.cols.y,2,what='mid')), o(top.stats(top.cols.y,2,what='div')))
-    else:
-        print("No Rules Found :( Try Again)")
+#
 
 
 #eg('the','show options', disp_setting)
@@ -268,7 +296,7 @@ def test_xpln():
 #eg('tree', 'make snd show tree of clusters', test_tree)
 #eg('sway', 'optimizing', test_sway)
 #eg('bins', 'find deltas between best and rest', test_bins)
-eg("xpln","explore explanation sets", test_xpln)
+#eg("xpln","explore explanation sets", test_xpln)
 
 main(egs)
 
